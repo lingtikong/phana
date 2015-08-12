@@ -19,8 +19,8 @@ TCLIB = -L/opt/libs/tricubic/1.0/lib -ltricubic
 # spglib 0.7.1, used to get the irreducible q-points
 # if UFLAG is not set, spglib won't be used.
 UFLAG  = -DUseSPG
-SPGINC = -I/opt/libs/spglib/0.7.1/include
-SPGLIB = -L/opt/libs/spglib/0.7.1/lib -lsymspg
+SPGINC = -I/opt/libs/spglib/1.1.2/include
+SPGLIB = -L/opt/libs/spglib/1.1.2/lib -lsymspg
 # if spglib > 0.7.1 is used, please 
 # 1) modify file phonon.cpp, instruction can be found by searching 0.7.1
 # 2) uncomment the following two lines

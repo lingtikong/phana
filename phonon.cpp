@@ -3,16 +3,13 @@
 #include "phonon.h"
 #include "green.h"
 #include "timer.h"
+#include "global.h"
 
 #ifdef UseSPG
 extern "C"{
 #include "spglib.h"
 }
 #endif
-
-#define MAXLINE 256
-#define MIN(a,b) ((a)>(b)?(b):(a))
-#define MAX(a,b) ((a)>(b)?(a):(b))
 
 /* ----------------------------------------------------------------------------
  * Class Phonon is the main driver to calculate phonon DOS, phonon
@@ -374,104 +371,6 @@ void Phonon::ldos_rsgf()
 
   }
   memory->destroy(Hessian);
-
-return;
-}
-
-/*------------------------------------------------------------------------------
- * Private method to evaluate the phonon dispersion curves
- *----------------------------------------------------------------------------*/
-void Phonon::pdisp()
-{
-  // ask the output file name and write the header.
-  char str[MAXLINE];
-  printf("Please input the filename to output the dispersion data [pdisp.dat]:");
-  if (count_words(fgets(str,MAXLINE,stdin)) < 1) strcpy(str, "pdisp.dat");
-  char *ptr = strtok(str," \t\n\r\f");
-  char *fname = new char[strlen(ptr)+1];
-  strcpy(fname,ptr);
-
-  FILE *fp = fopen(fname, "w");
-  fprintf(fp,"# q     qr    freq\n");
-  fprintf(fp,"# 2pi/L  2pi/L %s\n", dynmat->funit);
-
-  // to store the nodes of the dispersion curve
-  std::vector<double> nodes; nodes.clear();
-
-  // now the calculate the dispersion curve
-  double qstr[3], qend[3], q[3], qinc[3], qr=0., dq;
-  int nq = MAX(MAX(dynmat->nx,dynmat->ny),dynmat->nz)/2+1;
-  qend[0] = qend[1] = qend[2] = 0.;
-
-  double *egvs = new double [ndim];
-  while (1){
-    for (int i = 0; i < 3; ++i) qstr[i] = qend[i];
-
-    int quit = 0;
-    printf("\nPlease input the start q-point in unit of B1->B3, q to exit [%g %g %g]: ", qstr[0], qstr[1], qstr[2]);
-    int n = count_words(fgets(str,MAXLINE,stdin));
-    ptr = strtok(str," \t\n\r\f");
-    if ((n == 1) && (strcmp(ptr,"q") == 0)) break;
-    else if (n >= 3){
-      qstr[0] = atof(ptr);
-      qstr[1] = atof(strtok(NULL," \t\n\r\f"));
-      qstr[2] = atof(strtok(NULL," \t\n\r\f"));
-    }
-
-    do printf("Please input the end q-point in unit of B1->B3: ");
-    while (count_words(fgets(str,MAXLINE,stdin)) < 3);
-    qend[0] = atof(strtok(str," \t\n\r\f"));
-    qend[1] = atof(strtok(NULL," \t\n\r\f"));
-    qend[2] = atof(strtok(NULL," \t\n\r\f"));
-
-    printf("Please input the # of points along the line [%d]: ", nq);
-    if (count_words(fgets(str,MAXLINE,stdin)) > 0) nq = atoi(strtok(str," \t\n\r\f"));
-    nq = MAX(nq,2);
-
-    for (int i = 0; i < 3; ++i) qinc[i] = (qend[i]-qstr[i])/double(nq-1);
-    dq = sqrt(qinc[0]*qinc[0]+qinc[1]*qinc[1]+qinc[2]*qinc[2]);
-
-    nodes.push_back(qr);
-    for (int i = 0; i < 3; ++i) q[i] = qstr[i];
-    for (int ii = 0; ii < nq; ++ii){
-      double wii = 1.;
-      dynmat->getDMq(q, &wii);
-      if (wii > 0.){
-        dynmat->geteigen(egvs, 0);
-        fprintf(fp,"%lg %lg %lg %lg ", q[0], q[1], q[2], qr);
-        for (int i = 0; i < ndim; ++i) fprintf(fp," %lg", egvs[i]);
-      }
-      fprintf(fp,"\n");
-
-      for (int i = 0; i < 3; ++i) q[i] += qinc[i];
-      qr += dq;
-    }
-    qr -= dq;
-  }
-  if (qr > 0.) nodes.push_back(qr);
-  fclose(fp);
-  delete []egvs;
-
-  // write the gnuplot script which helps to visualize the result
-  int nnd = nodes.size();
-  if (nnd > 1){
-    fp = fopen("pdisp.gnuplot", "w");
-    fprintf(fp,"set term post enha colo 20\nset out %cpdisp.eps%c\n\n",char(34),char(34));
-    fprintf(fp,"set xlabel %cq%c\n",char(34),char(34));
-    fprintf(fp,"set ylabel %cfrequency (THz)%c\n\n",char(34),char(34));
-    fprintf(fp,"set xrange [0:%lg]\nset yrange [0:*]\n\n", nodes[nnd-1]);
-    fprintf(fp,"set grid xtics\n");
-    fprintf(fp,"# {/Symbol G} will give you letter gamma in the label\nset xtics (");
-    for (int i=0; i<nnd-1; i++) fprintf(fp,"%c%c %lg, ", char(34),char(34),nodes[i]);
-    fprintf(fp,"%c%c %lg)\n\n",char(34),char(34),nodes[nnd-1]);
-    fprintf(fp,"unset key\n\n");
-    fprintf(fp,"plot %c%s%c u 4:5 w l lt 1",char(34),fname,char(34));
-    for (int i=1; i<ndim; i++) fprintf(fp,",\\\n%c%c u 4:%d w l lt 1",char(34),char(34),i+5);
-    fclose(fp);
-  }
-
-  delete []fname;
-  nodes.clear();
 
 return;
 }
@@ -895,136 +794,38 @@ void Phonon::QMesh()
       wt[iq++] = w;
     }
 #ifdef UseSPG
-  }
-  if ((method == 2) && (atpos == NULL)){
-    memory->create(atpos, dynmat->nucell,3,"QMesh:atpos");
-    memory->create(attyp, dynmat->nucell,  "QMesh:attyp");
+  } else {
+    if (atpos == NULL) memory->create(atpos, dynmat->nucell,3,"QMesh:atpos");
+    if (attyp == NULL) memory->create(attyp, dynmat->nucell,  "QMesh:attyp");
 
+    num_atom = dynmat->nucell;
+    // set default, in case system dimension under study is not 3.
     for (int i = 0; i < dynmat->nucell; ++i)
     for (int idim = 0; idim < 3; ++idim) atpos[i][idim] = 0.;
+    for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 3; ++j) latvec[i][j] = 0.;
     for (int i = 0; i < 3; ++i) latvec[i][i] = 1.;
 
-    int flag_lat_info_read = dynmat->flag_latinfo;
+    // get atomic type info
+    for (int i = 0; i < num_atom; ++i) attyp[i] = dynmat->attyp[i];
 
-    if ( flag_lat_info_read ){ // get unit cell info from binary file; done by dynmat
-      num_atom = dynmat->nucell;
-      // set default, in case system dimension under study is not 3.
-      for (int i = 0; i < dynmat->nucell; ++i)
-      for (int idim = 0; idim < 3; ++idim) atpos[i][idim] = 0.;
-      for (int i = 0; i < 3; ++i) latvec[i][i] = 1.;
+    // get unit cell vector info
+    int ndim = 0;
+    for (int idim = 0; idim < 3; ++idim)
+    for (int jdim = 0; jdim < 3; ++jdim) latvec[jdim][idim] = dynmat->basevec[ndim++];
 
-      // get atomic type info
-      for (int i = 0; i < num_atom; ++i) attyp[i] = dynmat->attyp[i];
-      // get unit cell vector info
-      int ndim = 0;
-      for (int idim = 0; idim < 3; ++idim)
-      for (int jdim = 0; jdim < 3; ++jdim) latvec[jdim][idim] = dynmat->basevec[ndim++];
-      // get atom position in unit cell; fractional
-      for (int i = 0; i < num_atom; ++i)
-      for (int idim = 0; idim < sysdim; ++idim) atpos[i][idim] = dynmat->basis[i][idim];
+    // get atom position in unit cell; fractional
+    for (int i = 0; i < num_atom; ++i)
+    for (int idim = 0; idim < sysdim; ++idim) atpos[i][idim] = dynmat->basis[i][idim];
 
-      // display the unit cell info read
-      printf("\n");for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
-      printf("The basis vectors of the unit cell:\n");
-      for (int idim = 0; idim < 3; ++idim) printf("  A%d = %lg %lg %lg\n", idim+1, latvec[0][idim], latvec[1][idim], latvec[2][idim]);
-      printf("Atom(s) in the unit cell:\n");
-      printf("  No.  type  sx  sy sz\n");
-      for (int i = 0; i < num_atom; ++i) printf("  %d %d %lg %lg %lg\n", i+1, attyp[i], atpos[i][0], atpos[i][1], atpos[i][2]);
-      printf("\nIs the above info correct? (y/n)[y]: ");
-      fgets(str,MAXLINE,stdin);
-      char *ptr = strtok(str," \t\n\r\f");
-      if ( (ptr) && ( (strcmp(ptr,"y") != 0) && (strcmp(ptr,"Y") != 0)) ) flag_lat_info_read = 0;
-    }
+    // display the unit cell info read
+    printf("\n");for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
+    printf("The basis vectors of the unit cell:\n");
+    for (int idim = 0; idim < 3; ++idim) printf("  A%d = %lg %lg %lg\n", idim+1, latvec[0][idim], latvec[1][idim], latvec[2][idim]);
+    printf("Atom(s) in the unit cell:\n");
+    printf("  No.  type  sx  sy sz\n");
+    for (int i = 0; i < num_atom; ++i) printf("  %d %d %lg %lg %lg\n", i+1, attyp[i], atpos[i][0], atpos[i][1], atpos[i][2]);
 
-    if (flag_lat_info_read == 0) { // get unit cell info from file or user input
-      int latsrc = 1;
-      printf("\nPlease select the way to provide the unit cell info:\n");
-      printf("  1. By file;\n  2. Read in.\nYour choice [1]: ");
-      if (count_words(fgets(str,MAXLINE,stdin)) > 0) latsrc = atoi(strtok(str," \t\n\r\f"));
-      latsrc = 2-latsrc%2;
-      /*----------------------------------------------------------------
-       * Ask for lattice info from the user; the format of the file is:
-       * A1_x A1_y A1_z
-       * A2_x A2_y A2_z
-       * A3_x A3_y A3_z
-       * natom
-       * Type_1 sx_1 sy_1 sz_1
-       * ...
-       * Type_n sx_n sy_n sz_n
-       *----------------------------------------------------------------*/
-      if (latsrc == 1){ // to read unit cell info from file; get file name first
-        do printf("Please input the file name containing the unit cell info: ");
-        while (count_words(fgets(str,MAXLINE,stdin)) < 1);
-        char *fname = strtok(str," \t\n\r\f");
-        FILE *fp = fopen(fname,"r"); fname = NULL;
-  
-        if (fp == NULL) latsrc = 2;
-        else {
-          for (int i = 0; i < 3; ++i){ // read unit cell vector info; # of atoms per unit cell
-            if (count_words(fgets(str,MAXLINE,fp)) < 3){
-              latsrc = 2;
-              break;
-            }
-            latvec[0][i] = atof(strtok(str, " \t\n\r\f"));
-            latvec[1][i] = atof(strtok(NULL," \t\n\r\f"));
-            latvec[2][i] = atof(strtok(NULL," \t\n\r\f"));
-          }
-          if (count_words(fgets(str,MAXLINE,fp)) < 1) latsrc = 2;
-          else {
-            num_atom = atoi(strtok(str," \t\n\r\f"));
-            if (num_atom > dynmat->nucell){
-              printf("\nError: # of atoms read from file (%d) is bigger than that given by the dynamical matrix (%d)!\n", num_atom, dynmat->nucell);
-              return;
-            }
-      
-            for (int i = 0; i < num_atom; ++i){ // read atomic type and fractional positions
-              if (count_words(fgets(str,MAXLINE,fp)) < 4){
-                latsrc = 2;
-                break;
-
-              } else {
-                attyp[i] = atoi(strtok(str," \t\n\r\f"));
-
-                atpos[i][0] = atof(strtok(NULL," \t\n\r\f"));
-                atpos[i][1] = atof(strtok(NULL," \t\n\r\f"));
-                atpos[i][2] = atof(strtok(NULL," \t\n\r\f"));
-              }
-            }
-          }
-        }
-        fclose(fp);
-      }
-      if (latsrc == 2){
-        for (int i = 0; i < 3; ++i){
-          do printf("Please input the vector A%d: ", i+1);
-          while (count_words(fgets(str,MAXLINE,stdin)) < 3);
-          latvec[0][i] = atof(strtok(str," \t\n\r\f"));
-          latvec[1][i] = atof(strtok(NULL," \t\n\r\f"));
-          latvec[2][i] = atof(strtok(NULL," \t\n\r\f"));
-        }
-  
-        do printf("please input the number of atoms per unit cell: ");
-        while (count_words(fgets(str,MAXLINE,stdin)) < 1);
-        num_atom = atoi(strtok(str," \t\n\r\f"));
-        if (num_atom > dynmat->nucell){
-          printf("\nError: # of atoms input (%d) is bigger than that given by the dynamical matrix (%d)!\n", num_atom, dynmat->nucell);
-          return;
-        }
-  
-        for (int i = 0; i < num_atom; ++i){
-          do printf("Please input the type, and fractional coordinate of atom No.%d: ", i+1);
-          while (count_words(fgets(str,MAXLINE,stdin)) < 4);
-          attyp[i] = atoi(strtok(str," \t\n\r\f"));
-  
-          atpos[i][0] = atof(strtok(NULL," \t\n\r\f"));
-          atpos[i][1] = atof(strtok(NULL," \t\n\r\f"));
-          atpos[i][2] = atof(strtok(NULL," \t\n\r\f"));
-        }
-      }
-    } // end of read from file or input
-  } // end of if (method == 2 && ...
-
-  if (method == 2){
     int mesh[3], shift[3], is_time_reversal = 0;
     mesh[0] = nx; mesh[1] = ny; mesh[2] = nz;
     shift[0] = shift[1] = shift[2] = 0;
@@ -1035,13 +836,12 @@ void Phonon::QMesh()
     for (int i = 0; i < num_atom; ++i)
     for (int j = 0; j < 3; ++j) pos[i][j] = atpos[i][j];
 
-    //spg_show_symmetry(latvec, pos, attyp,  num_atom, symprec);
 
     // if spglib 0.7.1 is used
-    nq = spg_get_ir_reciprocal_mesh(grid_point, map, num_grid, mesh, shift, is_time_reversal, latvec, pos, attyp, num_atom, symprec);
+    // nq = spg_get_ir_reciprocal_mesh(grid_point, map, num_grid, mesh, shift, is_time_reversal, latvec, pos, attyp, num_atom, symprec);
 
     // if spglib >= 1.0.3 is used
-    //nq = spg_get_ir_reciprocal_mesh(grid_point, map, mesh, shift, is_time_reversal, latvec, pos, attyp, num_atom, symprec);
+    nq = spg_get_ir_reciprocal_mesh(grid_point, map, mesh, shift, is_time_reversal, latvec, pos, attyp, num_atom, symprec);
 
     memory->create(wt,   nq, "QMesh:wt");
     memory->create(qpts, nq,3,"QMesh:qpts");

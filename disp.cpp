@@ -18,6 +18,7 @@ void Phonon::pdisp()
 {
   // ask the output file name and write the header.
   char str[MAXLINE];
+  for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
   printf("Please input the filename to output the dispersion data [pdisp.dat]:");
   if (count_words(fgets(str,MAXLINE,stdin)) < 1) strcpy(str, "pdisp.dat");
   char *ptr = strtok(str," \t\n\r\f");
@@ -2841,7 +2842,11 @@ void Phonon::pdisp()
     fprintf(fp, "plot %c%s%c u 4:5 w l lt 1", qmk, fname, qmk);
     for (int i = 1; i < ndim; ++i) fprintf(fp,",\\\n%c%c u 4:%d w l lt 1", qmk, qmk, i+5);
     fclose(fp);
+
+    printf("Phonon dispersion data are written to: %s\n", fname);
+    printf("you can visualize the result by invoking:`gnuplot pdisp.gnuplot; gv pdisp.eps`\n");
   }
+  for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
 
   delete []fname;
   nodes.clear();

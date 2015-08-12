@@ -4,8 +4,7 @@
 #include <math.h>
 #include "green.h"
 #include <complex>
-
-#define MAXLINE 256
+#include "global.h"
 
 /*******************************************************************************
  * The class of Green is designed to evaluate the LDOS via the Green's Function

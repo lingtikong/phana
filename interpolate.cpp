@@ -1,9 +1,6 @@
 #include "interpolate.h"
 #include "math.h"
-
-#define MAXLINE 256
-#define MIN(a,b) ((a)>(b)?(b):(a))
-#define MAX(a,b) ((a)>(b)?(a):(b))
+#include "global.h"
 
 /* ----------------------------------------------------------------------------
  * Constructor used to get info from caller, and prepare other necessary data

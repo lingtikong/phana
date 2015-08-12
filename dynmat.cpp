@@ -1,8 +1,7 @@
 #include "dynmat.h"
 #include "math.h"
 #include "version.h"
-
-#define MAXLINE 256
+#include "global.h"
 
 // to intialize the class
 DynMat::DynMat(int narg, char **arg)
