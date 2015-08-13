@@ -19,12 +19,6 @@ void Phonon::pdisp()
   // ask the output file name and write the header.
   char str[MAXLINE];
   for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
-  printf("Please input the filename to output the dispersion data [pdisp.dat]:");
-  if (count_words(fgets(str,MAXLINE,stdin)) < 1) strcpy(str, "pdisp.dat");
-  char *ptr = strtok(str," \t\n\r\f");
-  char *fname = new char[strlen(ptr)+1];
-  strcpy(fname,ptr);
-
 #ifdef UseSPG
   // ask method to generate q-lines
   int method = 2;
@@ -35,6 +29,11 @@ void Phonon::pdisp()
   method = 2 - method%2;
   printf("Your  selection: %d\n", method);
 #endif
+  printf("\nPlease input the filename to output the dispersion data [pdisp.dat]:");
+  if (count_words(fgets(str,MAXLINE,stdin)) < 1) strcpy(str, "pdisp.dat");
+  char *ptr = strtok(str," \t\n\r\f");
+  char *fname = new char[strlen(ptr)+1];
+  strcpy(fname,ptr);
 
   // to store the nodes of the dispersion curve
   std::vector<double> nodes;        nodes.clear();
@@ -121,7 +120,8 @@ void Phonon::pdisp()
     for (int idim = 0; idim < 3; ++idim) printf("  A%d = %lg %lg %lg\n", idim+1, latvec[0][idim], latvec[1][idim], latvec[2][idim]);
     printf("Atom(s) in the unit cell:\n");
     printf("  No.  type  sx  sy sz\n");
-    for (int i = 0; i < num_atom; ++i) printf("  %d %d %lg %lg %lg\n", i+1, attyp[i], atpos[i][0], atpos[i][1], atpos[i][2]);
+    for (int i = 0; i < MIN(num_atom, NUMATOM); ++i) printf("  %d %d %lg %lg %lg\n", i+1, attyp[i], atpos[i][0], atpos[i][1], atpos[i][2]);
+    if (num_atom > NUMATOM) printf("  ... (%d atoms omitted.)\n", num_atom-NUMATOM);
 
     char symbol[11];
     double symprec = 1.e-4, pos[num_atom][3];
@@ -130,7 +130,7 @@ void Phonon::pdisp()
 
     int spgnum  = spg_get_international(symbol, latvec, pos, attyp, num_atom, symprec);
     // int spgnum2 = spg_get_schoenflies(ssym, latvec, pos, attyp, num_atom, symprec);
-    printf("The space group info of your unit cell is: %d => %s\n", spgnum, symbol);
+    printf("The space group number of your unit cell is: %d => %s\n", spgnum, symbol);
     // printf("The space group info of your unit cell is: %d => %s\n", spgnum2, ssym);
     for (int ii = 0; ii < 80; ++ii) printf("-"); printf("\n");
   
@@ -139,7 +139,6 @@ void Phonon::pdisp()
     const double lb = sqrt(latvec[1][0] * latvec[1][0] + latvec[1][1] * latvec[1][1] + latvec[1][2] * latvec[1][2]);
     const double lc = sqrt(latvec[2][0] * latvec[2][0] + latvec[2][1] * latvec[2][1] + latvec[2][2] * latvec[2][2]);
     const double cosa = sqrt(latvec[1][0] * latvec[2][0] + latvec[1][1] * latvec[2][1] + latvec[1][2] * latvec[2][2])/(lb*lc);
-    const double cosb = sqrt(latvec[0][0] * latvec[2][0] + latvec[0][1] * latvec[2][1] + latvec[0][2] * latvec[2][2])/(la*lc);
     const double cosg = sqrt(latvec[0][0] * latvec[1][0] + latvec[0][1] * latvec[1][1] + latvec[0][2] * latvec[1][2])/(la*lb);
     double ivec[3][3];
     ndim = 0;
@@ -147,9 +146,6 @@ void Phonon::pdisp()
     for (int jdim = 0; jdim < 3; ++jdim) ivec[jdim][idim] = dynmat->ibasevec[ndim++];
     const double ka = sqrt(ivec[0][0] * ivec[0][0] + ivec[0][1] * ivec[0][1] + ivec[0][2] * ivec[0][2]);
     const double kb = sqrt(ivec[1][0] * ivec[1][0] + ivec[1][1] * ivec[1][1] + ivec[1][2] * ivec[1][2]);
-    const double kc = sqrt(ivec[2][0] * ivec[2][0] + ivec[2][1] * ivec[2][1] + ivec[2][2] * ivec[2][2]);
-    const double coska = sqrt(ivec[1][0] * ivec[2][0] + ivec[1][1] * ivec[2][1] + ivec[1][2] * ivec[2][2])/(kb*kc);
-    const double coskb = sqrt(ivec[0][0] * ivec[2][0] + ivec[0][1] * ivec[2][1] + ivec[0][2] * ivec[2][2])/(ka*kc);
     const double coskg = sqrt(ivec[0][0] * ivec[1][0] + ivec[0][1] * ivec[1][1] + ivec[0][2] * ivec[1][2])/(ka*kb);
     
     double *qtmp;
@@ -2775,16 +2771,20 @@ void Phonon::pdisp()
     }
 
     // to determine the number of points along each line, with a step size of 0.05
-    const double qs_inv = 1./(0.05 * 0.05);
+    const double qs_inv = 1./QSTEP;
     int nbin = qs.size();
+    if (nbin > 0) printf("\nPhonon dispersion will be evaluated along lines:\n\t%s", ndstr[0].c_str());
     for (int is = 0; is < nbin; ++is){
       double *qstr = qs[is];
       double *qend = qe[is];
       double ql = 0.;
       for (int i = 0; i < 3; ++i) ql += (qend[i] - qstr[i])*(qend[i] - qstr[i]);
-      int nqpt = MAX(int(ql * qs_inv+0.5), 2);
+      int nqpt = MAX(int(sqrt(ql) * qs_inv + 0.5), 2);
       nqbin.push_back(nqpt);
+
+      printf("-%s", ndstr[is+1].c_str());
     }
+    if (nbin > 0) printf("\n");
   }
 #endif
 
@@ -2797,13 +2797,13 @@ void Phonon::pdisp()
   for (int is = 0; is < nbin; ++is){
     double *qstr = qs[is];
     double *qend = qe[is];
-    int nq = nqbin[is];
-    for (int i = 0; i < 3; ++i) qinc[i] = (qend[i]-qstr[i])/double(nq-1);
+    int nbin = nqbin[is];
+    for (int i = 0; i < 3; ++i) qinc[i] = (qend[i]-qstr[i])/double(nbin-1);
     dq = sqrt(qinc[0]*qinc[0]+qinc[1]*qinc[1]+qinc[2]*qinc[2]);
   
     nodes.push_back(qr);
     for (int i = 0; i < 3; ++i) q[i] = qstr[i];
-    for (int ii = 0; ii < nq; ++ii){
+    for (int ii = 0; ii < nbin; ++ii){
       double wii = 1.;
       dynmat->getDMq(q, &wii);
       if (wii > 0.){
@@ -2843,8 +2843,8 @@ void Phonon::pdisp()
     for (int i = 1; i < ndim; ++i) fprintf(fp,",\\\n%c%c u 4:%d w l lt 1", qmk, qmk, i+5);
     fclose(fp);
 
-    printf("Phonon dispersion data are written to: %s\n", fname);
-    printf("you can visualize the result by invoking:`gnuplot pdisp.gnuplot; gv pdisp.eps`\n");
+    printf("\nPhonon dispersion data are written to: %s, you can visualize the results\n", fname);
+    printf("by invoking: `gnuplot pdisp.gnuplot; gv pdisp.eps`\n");
   }
   for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
 

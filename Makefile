@@ -19,8 +19,8 @@ TCLIB = -L/opt/libs/tricubic/1.0/lib -ltricubic
 # spglib 0.7.1, used to get the irreducible q-points
 # if UFLAG is not set, spglib won't be used.
 UFLAG  = -DUseSPG
-SPGINC = -I/opt/libs/spglib/1.1.2/include
-SPGLIB = -L/opt/libs/spglib/1.1.2/lib -lsymspg
+SPGINC = -I/opt/libs/spglib/1.8.2/include
+SPGLIB = -L/opt/libs/spglib/1.8.2/lib -lsymspg
 # if spglib > 0.7.1 is used, please 
 # 1) modify file phonon.cpp, instruction can be found by searching 0.7.1
 # 2) uncomment the following two lines
@@ -39,7 +39,7 @@ SRC = $(wildcard *.cpp)
 OBJ = $(SRC:.cpp=.o)
 
 #====================================================================
-all:  ${EXE}
+all:  ver ${EXE}
 
 ${EXE}: $(OBJ)
 	$(LINK) $(OFLAGS) $(OBJ) $(LIB) -o $@
@@ -51,7 +51,7 @@ tar:
 	rm -f ${ROOT}.tar; tar -czvf ${ROOT}.tar.gz *.cpp  *.h Makefile README
 
 ver:
-	@echo "#define VERSION `git log|grep '^commit'|wc -l`" > version.h; cat version.h
+	@echo "#define VERSION `git log|grep '^commit'|wc -l`" > version.h
 
 #====================================================================
 .f.o:
