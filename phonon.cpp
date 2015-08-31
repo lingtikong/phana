@@ -824,7 +824,8 @@ void Phonon::QMesh()
     for (int idim = 0; idim < 3; ++idim) printf("  A%d = %lg %lg %lg\n", idim+1, latvec[0][idim], latvec[1][idim], latvec[2][idim]);
     printf("Atom(s) in the unit cell:\n");
     printf("  No.  type  sx  sy sz\n");
-    for (int i = 0; i < num_atom; ++i) printf("  %d %d %lg %lg %lg\n", i+1, attyp[i], atpos[i][0], atpos[i][1], atpos[i][2]);
+    for (int i = 0; i < MIN(num_atom, NUMATOM); ++i) printf("  %d %d %lg %lg %lg\n", i+1, attyp[i], atpos[i][0], atpos[i][1], atpos[i][2]);
+    if (num_atom > NUMATOM) printf("  ... (%d atoms omitted.)\n", num_atom - NUMATOM);
 
     int mesh[3], shift[3], is_time_reversal = 0;
     mesh[0] = nx; mesh[1] = ny; mesh[2] = nz;

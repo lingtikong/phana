@@ -113,47 +113,36 @@ DynMat::DynMat(int narg, char **arg)
   }
 
   // now try to read unit cell info from the binary file
-  flag_latinfo = 0;
-  memory->create(basis,nucell,sysdim,"DynMat:basis");
-  memory->create(attyp,nucell, "DynMat:attyp");
-  memory->create(M_inv_sqrt, nucell, "DynMat:M_inv_sqrt");
-  int flag_mass_read = 0;
+  memory->create(basis, nucell, sysdim, "DynMat:basis");
+  memory->create(attyp, nucell,         "DynMat:attyp");
+  memory->create(M_inv_sqrt, nucell,    "DynMat:M_inv_sqrt");
   
-  if ( fread(&Tmeasure,   sizeof(double), 1, fp) == 1) flag_latinfo |= 1;
-  if ( fread(&basevec[0], sizeof(double), 9, fp) == 9) flag_latinfo |= 2;
-  if ( fread(basis[0],    sizeof(double), fftdim, fp) == fftdim) flag_latinfo |= 4;
-  if ( fread(&attyp[0],   sizeof(int),    nucell, fp) == nucell) flag_latinfo |= 8;
-  if ( fread(&M_inv_sqrt[0], sizeof(double), nucell, fp) == nucell) flag_mass_read = 1;
+  if ( fread(&Tmeasure,      sizeof(double), 1,      fp) != 1     ){printf("\nError while reading temperature from file: %s\n",   binfile); fclose(fp); exit(3);}
+  if ( fread(&basevec[0],    sizeof(double), 9,      fp) != 9     ){printf("\nError while reading lattice info from file: %s\n",  binfile); fclose(fp); exit(3);}
+  if ( fread(basis[0],       sizeof(double), fftdim, fp) != fftdim){printf("\nError while reading basis info from file: %s\n",    binfile); fclose(fp); exit(3);}
+  if ( fread(&attyp[0],      sizeof(int),    nucell, fp) != nucell){printf("\nError while reading atom types from file: %s\n",    binfile); fclose(fp); exit(3);}
+  if ( fread(&M_inv_sqrt[0], sizeof(double), nucell, fp) != nucell){printf("\nError while reading atomic masses from file: %s\n", binfile); fclose(fp); exit(3);}
   fclose(fp);
 
-  if ((flag_latinfo&15) == 15){
-    car2dir(flag_mass_read);
-    real2rec();
-
-    flag_latinfo = 1;
-  } else {
-    Tmeasure = 0.;
-    flag_latinfo = 0;
-  }
+  car2dir();
+  real2rec();
 
   // initialize interpolation
   interpolate = new Interpolate(nx,ny,nz,fftdim2,DM_all);
   if (flag_reset_gamma) interpolate->reset_gamma();
 
-  if ( flag_mass_read ){ // M_inv_sqrt info read, the data stored are force constant matrix instead of dynamical matrix.
+  // Enforcing Austic Sum Rule
+  EnforceASR();
 
-    EnforceASR();
-
-    // get the dynamical matrix from force constant matrix: D = 1/M x Phi
-    for (int idq = 0; idq < npt; ++idq){
-      int ndim =0;
-      for (int idim = 0; idim < fftdim; ++idim)
-      for (int jdim = 0; jdim < fftdim; ++jdim){
-        double inv_mass = M_inv_sqrt[idim/sysdim]*M_inv_sqrt[jdim/sysdim];
-        DM_all[idq][ndim].r *= inv_mass;
-        DM_all[idq][ndim].i *= inv_mass;
-        ndim++;
-      }
+  // get the dynamical matrix from force constant matrix: D = 1/M x Phi
+  for (int idq = 0; idq < npt; ++idq){
+    int ndim =0;
+    for (int idim = 0; idim < fftdim; ++idim)
+    for (int jdim = 0; jdim < fftdim; ++jdim){
+      double inv_mass = M_inv_sqrt[idim/sysdim]*M_inv_sqrt[jdim/sysdim];
+      DM_all[idq][ndim].r *= inv_mass;
+      DM_all[idq][ndim].i *= inv_mass;
+      ndim++;
     }
   }
 
@@ -298,15 +287,8 @@ return;
 /* ----------------------------------------------------------------------------
  * private method to convert the cartisan coordinate of basis into fractional
  * ---------------------------------------------------------------------------- */
-void DynMat::car2dir(int flag)
+void DynMat::car2dir()
 {
-  if (!flag){ // in newer version, this is done in fix-phonon
-    for (int i = 0; i < 3; ++i){
-      basevec[i]   /= double(nx);
-      basevec[i+3] /= double(ny);
-      basevec[i+6] /= double(nz);
-    }
-  }
   double mat[9];
   for (int idim = 0; idim < 9; ++idim) mat[idim] = basevec[idim];
   GaussJordan(3, mat);
