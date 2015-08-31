@@ -25,5 +25,8 @@ The units of the output frequencies by this code is THz for
 LAMMPS units "real", "si", "metal", and "cgs"; in these cases,
 the frequencies are $\nu$ instead of $\omega$.
 
+For updates, please check:
+  http://nes.sjtu.edu.cn/english/research/software.htm
+
 Author: Ling-Ti Kong, konglt(at)sjtu.edu.cn
-Aug 2015
+Sep 2015

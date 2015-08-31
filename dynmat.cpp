@@ -89,7 +89,7 @@ DynMat::DynMat(int narg, char **arg)
 
   funit = new char[4];
   strcpy(funit, "THz");
-  if (boltz == 1.){eml2f = 1.; delete funit; funit = new char[22]; strcpy(funit,"sqrt(epsilon/(m.sigma^2))");}
+  if (boltz == 1.){eml2f = 1.; delete funit; funit = new char[27]; strcpy(funit,"sqrt(epsilon/(m.sigma^2))");}
   else if (boltz == 0.0019872067)  eml2f = 3.256576161;
   else if (boltz == 8.617343e-5)   eml2f = 15.63312493;
   else if (boltz == 1.3806504e-23) eml2f = 1.;
