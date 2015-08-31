@@ -600,7 +600,7 @@ void DynMat::ShowVersion()
   printf("               (  _ \\( )_( )  /__\\  ( \\( )  /__\\  \n");
   printf("                )___/ ) _ (  /(__)\\  )  (  /(__)\\ \n");
   printf("               (__)  (_) (_)(__)(__)(_)\\_)(__)(__)\n");
-  printf("\nPHonon ANAlyzer for Fix-Phonon, git version 1.%d, compiled on %s.\n", VERSION, __DATE__);
+  printf("\nPHonon ANAlyzer for Fix-Phonon, version 2.%02d, compiled on %s.\n", VERSION, __DATE__);
 
 return;
 }
