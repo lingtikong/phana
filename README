@@ -9,11 +9,11 @@ http://www.netlib.org/clapack/
 
 The tricubic library is also needed to to tricubic interpolations,
 which could be obtained from:
-   http://orca.princeton.edu/francois/software/tricubic/
+   https://github.com/nbigaouette/libtricubic
 or
    http://1drv.ms/1J2WFYk
 
-The spglib (version 0.7.1) is optionally needed, enabling one to
+The spglib is optionally needed, enabling one to
 evaluate the phonon density of states or vibrational thermal
 properties using only the irreducible q-points in the first
 Brillouin zone.
@@ -29,4 +29,4 @@ For updates, please check:
   http://nes.sjtu.edu.cn/english/research/software.htm
 
 Author: Ling-Ti Kong, konglt(at)sjtu.edu.cn
-Sep 2015
+Sep 2018
