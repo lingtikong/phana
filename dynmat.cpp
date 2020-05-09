@@ -606,7 +606,7 @@ void DynMat::phonopy()
    memory->create(out, npt, "phonopy:in");
    memory->create(fc,  npt, fftdim2, "phonopy:in");
 
-   fftw_plan plan = fftw_plan_dft_3d(nx, ny, nz, in, out, 1, FFTW_ESTIMATE);
+   fftw_plan plan = fftw_plan_dft_3d(nx, ny, nz, in, out, -1, FFTW_ESTIMATE);
 
    for (int idim = 0; idim < fftdim2; ++idim){
       for (int i = 0; i < npt; ++i){
@@ -622,6 +622,7 @@ void DynMat::phonopy()
 
    // in POSCAR, atoms are sorted/aggregated by type, while for LAMMPS there is no such requirment
    int type_id[nucell], num_type[nucell], ntype = 0;
+   double mass[nucell];
    for (int i = 0; i < nucell; ++i) num_type[i] = 0;
 
    for (int i = 0; i < nucell; ++i){
@@ -630,10 +631,10 @@ void DynMat::phonopy()
          if (attyp[i] == type_id[j]) ip = j;
       }
       if (ip == ntype){
-         type_id[ntype] = attyp[i];
-         num_type[ntype]++;
-         ntype++;
+         mass[ntype] = 1./(M_inv_sqrt[i]*M_inv_sqrt[i]);
+         type_id[ntype++] = attyp[i];
       }
+      num_type[ip]++;
    }
    std::map<int, int> iu_by_type;
    iu_by_type.clear();
@@ -670,7 +671,7 @@ void DynMat::phonopy()
          for (int idim = iu * sysdim; idim < (iu+1)*sysdim; ++idim){
             for (int jdim = ju * sysdim; jdim < (ju+1)*sysdim; ++jdim){
                int dd = idim * fftdim + jdim;
-               fprintf(fp, " %20.10g", fc[id][dd]);
+               fprintf(fp, " %lg", fc[id][dd]);
             }
             fprintf(fp, "\n");
          }
@@ -682,7 +683,9 @@ void DynMat::phonopy()
 
    // write the primitive cell in POSCAR format
    fp = fopen("POSCAR.primitive", "w");
-   fprintf(fp, "Primitive/Unit Cell\n1.\n");
+   fprintf(fp, "Fix-phonon unit cell");
+   for (int ip = 0; ip < ntype; ++ip) fprintf(fp, ", Elem-%d: %lg", type_id[ip], mass[ip]);
+   fprintf(fp, "\n1.\n"); 
    int ndim = 0;
    for (int idim = 0; idim < 3; ++idim){
       for (int jdim = 0; jdim < 3; ++jdim) fprintf(fp, "%lg ", basevec[ndim++]);
@@ -742,7 +745,9 @@ void DynMat::phonopy()
    printf("One should be able to obtain the phonon band structure after correcting\n");
    printf("the element names in POSCAR.primitive and band.conf by running\n");
    printf("`phonopy --readfc -c POSCAR.primitive -p band.conf`.\n");
-   printf("***          Remember to correct the element names.           ***\n");
+   for (int ii = 0; ii < 80; ++ii) printf("-");
+   printf("\n***          Remember to correct the element names.           ***\n");
+   for (int ii = 0; ii < 80; ++ii) printf("-");
    kp->show_path();
    for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
 
