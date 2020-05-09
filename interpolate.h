@@ -5,13 +5,12 @@
 #include "stdlib.h"
 #include "string.h"
 #include "memory.h"
-#include <tricubic.h>
+#include "tricubic.h"
+
 extern "C"{
 #include "f2c.h"
 #include "clapack.h"
 }
-
-using namespace std;
 
 class Interpolate{
 public:

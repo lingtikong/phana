@@ -7,12 +7,9 @@
 #include "memory.h"
 #include "interpolate.h"
 
-extern "C"{
-#include "f2c.h"
-#include "clapack.h"
-}
-
-using namespace std;
+#ifdef FFTW3
+#include "qnodes.h"
+#endif
 
 class DynMat {
 public:
@@ -22,7 +19,7 @@ public:
 
   int nx, ny, nz, nucell;
   int sysdim, fftdim;
-  double eml2f;
+  double eml2f, eml2fc;
   char *funit;
 
   void getDMq(double *);
@@ -31,6 +28,9 @@ public:
   void writeDMq(double *, const double, FILE *fp);
   int geteigen(double *, int);
   void reset_interp_method();
+#ifdef FFTW3
+  void phonopy(); // to write the force constants for phonopy
+#endif
 
   doublecomplex **DM_q;
 

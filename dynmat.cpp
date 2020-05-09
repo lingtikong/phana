@@ -2,6 +2,13 @@
 #include "math.h"
 #include "version.h"
 #include "global.h"
+#include <map>
+
+#ifdef FFTW3
+#include "fftw3.h"
+#include "qnodes.h"
+#include "kpath.h"
+#endif
 
 // to intialize the class
 DynMat::DynMat(int narg, char **arg)
@@ -16,6 +23,7 @@ DynMat::DynMat(int narg, char **arg)
   attyp = NULL;
   basis = NULL;
   flag_reset_gamma = flag_skip = 0;
+  int flag_phonopy = 0;
 
   // analyze the command line options
   int iarg = 1;
@@ -25,6 +33,9 @@ DynMat::DynMat(int narg, char **arg)
 
     } else if (strcmp(arg[iarg], "-r") == 0){
       flag_reset_gamma = 1;
+
+    } else if (strcmp(arg[iarg], "-p") == 0){
+      flag_phonopy = 1;
 
     } else if (strcmp(arg[iarg], "-h") == 0){
       help();
@@ -89,16 +100,47 @@ DynMat::DynMat(int narg, char **arg)
 
   funit = new char[4];
   strcpy(funit, "THz");
-  if (boltz == 1.){eml2f = 1.; delete funit; funit = new char[27]; strcpy(funit,"sqrt(epsilon/(m.sigma^2))");}
-  else if (boltz == 0.0019872067)  eml2f = 3.256576161;
-  else if (boltz == 8.617343e-5)   eml2f = 15.63312493;
-  else if (boltz == 1.3806504e-23) eml2f = 1.;
-  else if (boltz == 1.3806504e-16) eml2f = 1.591549431e-14;
-  else {
-    printf("WARNING: Because of float precision, I cannot get the factor to convert sqrt(E/ML^2)\n");
-    printf("into THz, instead, I set it to be 1; you should check the unit used by LAMMPS.\n");
-    eml2f = 1.;
+
+  if (fabs(boltz - 1.) <= ZERO){        // LJ Unit
+     eml2f = eml2fc = 1.;
+     delete funit;
+     funit = new char[27];
+     strcpy(funit,"sqrt(epsilon/(m.sigma^2))");
+
+  } else if (fabs(boltz - 0.0019872067) <= ZERO){ // real
+     eml2f = 3.255487031;
+     eml2fc = 0.0433641042418;
+
+  } else if (fabs(boltz*1.e3 - 8.617343e-2) <= ZERO){ // metal
+     eml2f = 15.633304237154924;
+     eml2fc = 1.;
+
+  } else if (fabs(boltz*1.e20 - 1.3806504e-3) <= ZERO){ // si
+     eml2f = 1.591549431e-13;
+     eml2fc = 0.06241509074460763;
+
+  } else if (fabs(boltz*1.e13 - 1.3806504e-3) <= ZERO){ // cgs
+     eml2f = 1.591549431e-13;
+     eml2fc = 6.241509074460763e-05;
+
+  } else if (fabs(boltz*1.e3 - 3.16681534e-3) <= ZERO){ // electron
+     eml2f  = 154.10792761319672;
+     eml2fc = 97.1736242922823;
+
+  } else if (fabs(boltz*1.e5 - 1.3806504e-3) <= ZERO){ // micro
+     eml2f  = 1.5915494309189532e-07;
+     eml2fc = 6.241509074460763e-05;
+
+  } else if (fabs(boltz - 0.013806504) <= ZERO){ // nano
+     eml2f  = 0.0001591549431;
+     eml2fc = 1.036426965268e-10;
+
+  }  else {
+    printf("WARNING: Perhaps because of float precision, I cannot get the factor to convert\n");
+    printf("sqrt(E/ML^2)/(2*pi) into THz, instead, I set it to 1; you should check the unit\nused by LAMMPS.\n");
+    eml2f = eml2fc = 1.;
   }
+  eml2fc /= double(npt);
 
   // now to allocate memory for DM
   memory = new Memory();
@@ -133,6 +175,9 @@ DynMat::DynMat(int narg, char **arg)
 
   // Enforcing Austic Sum Rule
   EnforceASR();
+
+  // write phonopy files and exit
+  if (flag_phonopy){phonopy(); exit(0);}
 
   // get the dynamical matrix from force constant matrix: D = 1/M x Phi
   for (int idq = 0; idq < npt; ++idq){
@@ -547,6 +592,166 @@ void DynMat::reset_interp_method()
 return;
 }
 
+#ifdef FFTW3
+/* ----------------------------------------------------------------------------
+ * Public method to write out the force constants and related files for
+ * postprocessing with phonopy.
+ * Must be called after EnforceASR and before getting the DM.
+ * ---------------------------------------------------------------------------- */
+void DynMat::phonopy()
+{
+   fftw_complex *in, *out;
+   double **fc;
+   memory->create(in,  npt, "phonopy:in");
+   memory->create(out, npt, "phonopy:in");
+   memory->create(fc,  npt, fftdim2, "phonopy:in");
+
+   fftw_plan plan = fftw_plan_dft_3d(nx, ny, nz, in, out, 1, FFTW_ESTIMATE);
+
+   for (int idim = 0; idim < fftdim2; ++idim){
+      for (int i = 0; i < npt; ++i){
+         in[i][0] = DM_all[i][idim].r;
+         in[i][1] = DM_all[i][idim].i;
+      }
+      fftw_execute(plan);
+      for (int i = 0; i < npt; ++i) fc[i][idim] = out[i][0] * eml2fc;
+   }
+   fftw_destroy_plan(plan);
+   memory->destroy(in);
+   memory->destroy(out);
+
+   // in POSCAR, atoms are sorted/aggregated by type, while for LAMMPS there is no such requirment
+   int type_id[nucell], num_type[nucell], ntype = 0;
+   for (int i = 0; i < nucell; ++i) num_type[i] = 0;
+
+   for (int i = 0; i < nucell; ++i){
+      int ip = ntype;
+      for (int j = 0; j < ntype; ++j){
+         if (attyp[i] == type_id[j]) ip = j;
+      }
+      if (ip == ntype){
+         type_id[ntype] = attyp[i];
+         num_type[ntype]++;
+         ntype++;
+      }
+   }
+   std::map<int, int> iu_by_type;
+   iu_by_type.clear();
+   int id_new = 0;
+   for (int i = 0; i < ntype; ++i){
+      for (int j = 0; j < nucell; ++j){
+         if (attyp[j] == type_id[i]) iu_by_type[id_new++] = j;
+      }
+   }
+
+   // write the FORCE_CONSTANTS file
+   FILE *fp = fopen("FORCE_CONSTANTS", "w");
+   int natom = npt * nucell;
+   fprintf(fp, "%d %d\n", natom, natom);
+   for (int i = 0; i < natom; ++i){
+      int iu = i / npt;
+      int ix = (i % npt) / (ny * nz);
+      int iy = (i % (ny *nz) ) / nz;
+      int iz = i % nz;
+      iu = iu_by_type[iu];
+
+      for (int j = 0; j < natom; ++j){
+         int ju = j / npt;
+         int jx = (j % npt) / (ny * nz);
+         int jy = (j % (ny *nz) ) / nz;
+         int jz = j % nz;
+
+         int dx = abs(ix - jx);
+         int dy = abs(iy - jy);
+         int dz = abs(iz - jz);
+         int id = (dx * ny + dy) *  nz + dz;
+         ju = iu_by_type[ju];
+         fprintf(fp, "%d %d\n", i+1, j+1);
+         for (int idim = iu * sysdim; idim < (iu+1)*sysdim; ++idim){
+            for (int jdim = ju * sysdim; jdim < (ju+1)*sysdim; ++jdim){
+               int dd = idim * fftdim + jdim;
+               fprintf(fp, " %20.10g", fc[id][dd]);
+            }
+            fprintf(fp, "\n");
+         }
+      }
+   }
+   fclose(fp);
+   iu_by_type.clear();
+   memory->destroy(fc);
+
+   // write the primitive cell in POSCAR format
+   fp = fopen("POSCAR.primitive", "w");
+   fprintf(fp, "Primitive/Unit Cell\n1.\n");
+   int ndim = 0;
+   for (int idim = 0; idim < 3; ++idim){
+      for (int jdim = 0; jdim < 3; ++jdim) fprintf(fp, "%lg ", basevec[ndim++]);
+      fprintf(fp, "\n");
+   }
+   for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]); fprintf(fp, "\n");
+   for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "%d ", num_type[ip]);
+   fprintf(fp, "\nDirect\n");
+   for (int ip = 0; ip < ntype; ++ip){
+      for (int i = 0; i < nucell; ++i){
+         if (attyp[i] == type_id[ip]){
+            fprintf(fp, "%lg %lg %lg\n", basis[i][0], basis[i][1], basis[i][2]);
+         }
+      }
+   }
+   fclose(fp);
+
+  // Get high symmetry k-path
+   QNodes *q = new QNodes();
+   kPath *kp = new kPath(this, q);
+   kp->kpath();
+   
+   // band.conf
+   fp = fopen("band.conf", "w");
+   fprintf(fp, "ATOM_NAME = ");
+   for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]);
+   fprintf(fp, "\nDIM = %d %d %d\nBAND = ", nx, ny, nz);
+   int nsect = q->qs.size();
+
+   for (int i = 0; i < nsect; ++i){
+      fprintf(fp, " %lg %lg %lg", q->qs[i][0], q->qs[i][1], q->qs[i][2]);
+      if (i+1 < nsect){
+         double dq = 0.;
+         for (int j = 0; j < 3; ++j) dq += (q->qe[i][j] - q->qs[i+1][j]) * (q->qe[i][j] - q->qs[i+1][j]);
+         if (dq > ZERO) {
+            fprintf(fp, " %lg %lg %lg,", q->qe[i][0], q->qe[i][1], q->qe[i][2]);
+         }
+      } else if (i+1 == nsect){
+         fprintf(fp, " %lg %lg %lg\n", q->qe[i][0], q->qe[i][1], q->qe[i][2]);
+      }
+   }
+   fprintf(fp, "\nBAND_POINTS = 21\nBAND_LABELS =");
+   for (int i = 0; i < q->ndstr.size(); ++i){
+      std::size_t found = q->ndstr[i].find("{/Symbol G}");
+      if (found != std::string::npos) q->ndstr[i].replace(found, found+11, "$\\Gamma$");
+      found = q->ndstr[i].find("/");
+      if (found != std::string::npos) q->ndstr[i].replace(found, found, " ");
+      fprintf(fp, " %s", q->ndstr[i].c_str());
+   }
+   fprintf(fp, "\nFORCE_CONSTANTS = READ\nBAND_CONNECTION = .TRUE.\n");
+
+   // output info
+   for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
+   printf("The force constants information is extracted and written to FORCE_CONSTANTS,\n");
+   printf("the primitive cell is written to POSCAR.primitive, and the input file for\n");
+   printf("phonopy band evaluation is written to band.conf.\n");
+   printf("One should be able to obtain the phonon band structure after correcting\n");
+   printf("the element names in POSCAR.primitive and band.conf by running\n");
+   printf("`phonopy --readfc -c POSCAR.primitive -p band.conf`.\n");
+   printf("***          Remember to correct the element names.           ***\n");
+   kp->show_path();
+   for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
+
+   delete kp;
+   delete q;
+return;
+}
+#endif
+
 /* ----------------------------------------------------------------------------
  * Private method to display help info
  * ---------------------------------------------------------------------------- */
@@ -559,13 +764,13 @@ void DynMat::help()
   printf("              polynomial interpolation along the [100] direction; this might be\n");
   printf("              useful for systems with charges. As for charged system, the dynamical\n");
   printf("              matrix at Gamma is far from accurate because of the long range nature\n");
-  printf("              of Coulombic interaction. By reset it by interpolation, will partially\n");
+  printf("              of Coulombic interaction. Resetting it by interpolation will partially\n");
   printf("              elliminate the unwanted behavior, but the result is still inaccurate.\n");
-  printf("              By default, this is not set; and not expected for uncharged systems.\n\n");
+  printf("              By default, this is not set.\n\n");
   printf("  -s          This will reset the dynamical matrix at the gamma point, too, but it\n");
   printf("              will also inform the code to skip all q-points that is in the vicinity\n");
   printf("              of the gamma point when evaluating phonon DOS and/or phonon dispersion.\n\n");
-  printf("              By default, this is not set; and not expected for uncharged systems.\n\n");
+  printf("              By default, this is not set.\n\n");
   printf("  -h          To print out this help info.\n\n");
   printf("  file        To define the filename that carries the binary dynamical matrice generated\n");
   printf("              by fix-phonon. If not provided, the code will ask for it.\n");
