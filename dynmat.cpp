@@ -600,6 +600,10 @@ return;
  * ---------------------------------------------------------------------------- */
 void DynMat::phonopy()
 {
+   // output info
+   for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
+   fprintf("Now to prepare the phonopy FORCE_CONSTANTS ...");
+
    fftw_complex *in, *out;
    double **fc;
    memory->create(in,  npt, "phonopy:in");
@@ -665,7 +669,7 @@ void DynMat::phonopy()
          int dx = abs(ix - jx);
          int dy = abs(iy - jy);
          int dz = abs(iz - jz);
-         int id = (dx * ny + dy) *  nz + dz;
+         int id = (dz * ny + dy) *  nx + dx;
          ju = iu_by_type[ju];
          fprintf(fp, "%d %d\n", i+1, j+1);
          for (int idim = iu * sysdim; idim < (iu+1)*sysdim; ++idim){
@@ -738,8 +742,7 @@ void DynMat::phonopy()
    fprintf(fp, "\nFORCE_CONSTANTS = READ\nBAND_CONNECTION = .TRUE.\n");
 
    // output info
-   for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
-   printf("The force constants information is extracted and written to FORCE_CONSTANTS,\n");
+   printf("Done!\nThe force constants information is extracted and written to FORCE_CONSTANTS,\n");
    printf("the primitive cell is written to POSCAR.primitive, and the input file for\n");
    printf("phonopy band evaluation is written to band.conf.\n");
    printf("One should be able to obtain the phonon band structure after correcting\n");
