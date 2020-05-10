@@ -779,6 +779,10 @@ void DynMat::help()
   printf("              will also inform the code to skip all q-points that is in the vicinity\n");
   printf("              of the gamma point when evaluating phonon DOS and/or phonon dispersion.\n\n");
   printf("              By default, this is not set.\n\n");
+  printf("  -p          To prepare for the inputs necessary for phonopy: a FORCE_CONSTANTS will\n");
+  printf("              written together with POSCAR.primitive and band.conf. This way one can\n");
+  printf("              make use of the functions provided by phonopy. The code will exit once\n");
+  printf("              this has been done.\n\n");
   printf("  -h          To print out this help info.\n\n");
   printf("  file        To define the filename that carries the binary dynamical matrice generated\n");
   printf("              by fix-phonon. If not provided, the code will ask for it.\n");
@@ -796,6 +800,7 @@ void DynMat::ShowVersion()
   printf("                )___/ ) _ (  /(__)\\  )  (  /(__)\\ \n");
   printf("               (__)  (_) (_)(__)(__)(_)\\_)(__)(__)\n");
   printf("\nPHonon ANAlyzer for Fix-Phonon, version 2.%02d, compiled on %s.\n", VERSION, __DATE__);
+  printf("Reference: https://doi.org/10.1016/j.cpc.2011.04.019\n");
 
 return;
 }
