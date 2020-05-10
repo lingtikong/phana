@@ -602,7 +602,7 @@ void DynMat::phonopy()
 {
    // output info
    for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
-   fprintf("Now to prepare the phonopy FORCE_CONSTANTS ...");
+   printf("Now to prepare the phonopy FORCE_CONSTANTS ...");
 
    fftw_complex *in, *out;
    double **fc;
