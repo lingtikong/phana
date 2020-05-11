@@ -180,8 +180,6 @@ DynMat::DynMat(int narg, char **arg)
      }
    }
 
-   interpolate->set_method();
-
    return;
 }
 
