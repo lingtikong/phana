@@ -54,7 +54,7 @@ private:
   void GaussJordan(int, double *);
 
   void help();
-  void ShowLattice();
+  void ShowInfo();
   void ShowVersion();
   void Define_Conversion_Factor();
 };

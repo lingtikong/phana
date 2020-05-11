@@ -299,7 +299,7 @@ void Interpolate::reset_gamma()
  
    double const one6 = -1./6., two3 = 2./3.;
  
-   for (int idim=0; idim<ndim; idim++){
+   for (int idim=0; idim < ndim; idim++){
       data[0][idim].i = 0.;
       data[0][idim].r = (data[im2][idim].r + data[ip2][idim].r) * one6
                       + (data[im1][idim].r + data[ip1][idim].r) * two3;

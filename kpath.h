@@ -27,5 +27,6 @@ private:
   char symbol[11];
   int spgnum, sysdim, fftdim, num_atom, *attyp;
   double latvec[3][3], **atpos;
+
 };
 #endif
