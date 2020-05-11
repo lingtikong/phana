@@ -13,46 +13,46 @@ extern "C"{
  * ---------------------------------------------------------------------------- */
 kPath::kPath(DynMat *dm, QNodes *qn)
 {
-  // create memory 
-  memory = new Memory();
-
-  // pass the class from main
-  q = qn;
-  dynmat = dm;
-  sysdim = dynmat->sysdim;
-  num_atom = dynmat->nucell;
-  
-  memory->create(atpos, num_atom, 3, "kpath:atpos");
-  memory->create(attyp, num_atom,    "kpath:attyp");
-  
-  // set default, in case system dimension under study is not 3.
-  for (int i = 0; i < num_atom; ++i)
-  for (int idim = 0; idim < 3; ++idim) atpos[i][idim] = 0.;
-
-  for (int i = 0; i < 3; ++i)
-  for (int j = 0; j < 3; ++j) latvec[i][j] = 0.;
-
-  for (int i = 0; i < 3; ++i) latvec[i][i] = 1.;
-
-  // get atomic type info
-  for (int i = 0; i < num_atom; ++i) attyp[i] = dynmat->attyp[i];
-
-  // get unit cell vector info
-  int ndim = 0;
-  for (int idim = 0; idim < 3; ++idim)
-  for (int jdim = 0; jdim < 3; ++jdim) latvec[jdim][idim] = dynmat->basevec[ndim++];
-
-  // get atom position in unit cell; fractional
-  for (int i = 0; i < num_atom; ++i)
-  for (int idim = 0; idim < sysdim; ++idim) atpos[i][idim] = dynmat->basis[i][idim];
-
-  // get the space group number
-  double symprec = 1.e-4, pos[num_atom][3];
-  for (int i = 0; i < num_atom; ++i)
-  for (int j = 0; j < 3; ++j) pos[i][j] = atpos[i][j];
-  spgnum  = spg_get_international(symbol, latvec, pos, attyp, num_atom, symprec);
-
-return;
+   // create memory 
+   memory = new Memory();
+ 
+   // pass the class from main
+   q = qn;
+   dynmat = dm;
+   sysdim = dynmat->sysdim;
+   num_atom = dynmat->nucell;
+   
+   memory->create(atpos, num_atom, 3, "kpath:atpos");
+   memory->create(attyp, num_atom,    "kpath:attyp");
+   
+   // set default, in case system dimension under study is not 3.
+   for (int i = 0; i < num_atom; ++i)
+   for (int idim = 0; idim < 3; ++idim) atpos[i][idim] = 0.;
+ 
+   for (int i = 0; i < 3; ++i)
+   for (int j = 0; j < 3; ++j) latvec[i][j] = 0.;
+ 
+   for (int i = 0; i < 3; ++i) latvec[i][i] = 1.;
+ 
+   // get atomic type info
+   for (int i = 0; i < num_atom; ++i) attyp[i] = dynmat->attyp[i];
+ 
+   // get unit cell vector info
+   int ndim = 0;
+   for (int idim = 0; idim < 3; ++idim)
+   for (int jdim = 0; jdim < 3; ++jdim) latvec[jdim][idim] = dynmat->basevec[ndim++];
+ 
+   // get atom position in unit cell; fractional
+   for (int i = 0; i < num_atom; ++i)
+   for (int idim = 0; idim < sysdim; ++idim) atpos[i][idim] = dynmat->basis[i][idim];
+ 
+   // get the space group number
+   double symprec = 1.e-4, pos[num_atom][3];
+   for (int i = 0; i < num_atom; ++i)
+   for (int j = 0; j < 3; ++j) pos[i][j] = atpos[i][j];
+   spgnum  = spg_get_international(symbol, latvec, pos, attyp, num_atom, symprec);
+ 
+   return;
 }
 
 /* ----------------------------------------------------------------------------
@@ -60,25 +60,26 @@ return;
  * ---------------------------------------------------------------------------- */
 void kPath::show_info()
 {
-  // display the unit cell info read
-  for (int ii = 0; ii < 80; ++ii) printf("-"); printf("\n");
-  printf("The basis vectors of the unit cell:\n");
-  for (int idim = 0; idim < 3; ++idim){
-     printf("  A%d =", idim+1);
-     for (int jdim = 0; jdim < 3; ++jdim) printf(" %lg", latvec[jdim][idim]);
-     printf("\n");
-  }
-
-  printf("Atom(s) in the unit cell:\n");
-  printf("  No.  type  sx  sy sz\n");
-  for (int i = 0; i < MIN(num_atom, NUMATOM); ++i) printf("  %d %d %lg %lg %lg\n", i+1, attyp[i], atpos[i][0], atpos[i][1], atpos[i][2]);
-  if (num_atom > NUMATOM) printf("  ... (%d atoms omitted.)\n", num_atom-NUMATOM);
-
-  printf("The space group number of your unit cell is: %d => %s\n", spgnum, symbol);
-  for (int ii = 0; ii < 80; ++ii) printf("-"); printf("\n");
-
-  return;
-};
+   // display the unit cell info read
+   for (int ii = 0; ii < 80; ++ii) printf("-"); printf("\n");
+   printf("The basis vectors of the unit cell:\n");
+   for (int idim = 0; idim < 3; ++idim){
+      printf("  A%d =", idim+1);
+      for (int jdim = 0; jdim < 3; ++jdim) printf(" %lg", latvec[jdim][idim]);
+      printf("\n");
+   }
+ 
+   printf("Atom(s) in the unit cell:\n");
+   printf("  No.  type  sx  sy sz\n");
+   for (int i = 0; i < MIN(num_atom, NUMATOM); ++i)
+      printf("  %d %d %lg %lg %lg\n", i+1, attyp[i], atpos[i][0], atpos[i][1], atpos[i][2]);
+   if (num_atom > NUMATOM) printf("  ... (%d atoms omitted.)\n", num_atom-NUMATOM);
+ 
+   printf("The space group number of your unit cell is: %d => %s\n", spgnum, symbol);
+   for (int ii = 0; ii < 80; ++ii) printf("-"); printf("\n");
+ 
+   return;
+}
 
 
 /* ----------------------------------------------------------------------------
@@ -86,11 +87,13 @@ void kPath::show_info()
  * ---------------------------------------------------------------------------- */
 kPath::~kPath( )
 {
-  memory->destroy(attyp);
-  memory->destroy(atpos);
-  delete memory;
-  dynmat = NULL;
-  q = NULL;
+   memory->destroy(attyp);
+   memory->destroy(atpos);
+   delete memory;
+   dynmat = NULL;
+   q = NULL;
+
+   return;
 }
   
 /* ----------------------------------------------------------------------------
@@ -2738,36 +2741,36 @@ void kPath::kpath( )
   } else {
     printf("\nSorry, failed to identify the crystal system, please use the manual mode.\n");
   }
+ 
+   // to determine the number of points along each line, with a step size of 0.05
+   const double qs_inv = 1./QSTEP;
+   int nbin = q->qs.size();
+   for (int is = 0; is < nbin; ++is){
+      double *qstr = q->qs[is];
+      double *qend = q->qe[is];
+      double ql = 0.;
+      for (int i = 0; i < 3; ++i) ql += (qend[i] - qstr[i])*(qend[i] - qstr[i]);
+      int nqpt = MAX(int(sqrt(ql) * qs_inv + 0.5), 2);
+      q->nqbin.push_back(nqpt);
+   }
 
-  // to determine the number of points along each line, with a step size of 0.05
-  const double qs_inv = 1./QSTEP;
-  int nbin = q->qs.size();
-  for (int is = 0; is < nbin; ++is){
-    double *qstr = q->qs[is];
-    double *qend = q->qe[is];
-    double ql = 0.;
-    for (int i = 0; i < 3; ++i) ql += (qend[i] - qstr[i])*(qend[i] - qstr[i]);
-    int nqpt = MAX(int(sqrt(ql) * qs_inv + 0.5), 2);
-    q->nqbin.push_back(nqpt);
-  }
-
-return;
-};
+   return;
+}
 
 /* ----------------------------------------------------------------------------
  * Show the k-path info
  * ---------------------------------------------------------------------------- */
 void kPath::show_path()
 {
-  if (q == NULL) return;
-  int nbin = q->ndstr.size();
-  if (nbin > 0){
-     printf("\nk-path for the current lattice will be:\n\t%s", q->ndstr[0].c_str());
-     for (int is = 1; is < nbin; ++is) printf("-%s", q->ndstr[is].c_str());
-     printf("\n");
-  }
+   if (q == NULL) return;
+   int nbin = q->ndstr.size();
+   if (nbin > 0){
+      printf("\nk-path for the current lattice will be:\n\t%s", q->ndstr[0].c_str());
+      for (int is = 1; is < nbin; ++is) printf("-%s", q->ndstr[is].c_str());
+      printf("\n");
+   }
 
-return;
-};
-
+   return;
+}
+/* ---------------------------------------------------------------------------- */
 #endif

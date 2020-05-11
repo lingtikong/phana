@@ -6,13 +6,13 @@
  * ---------------------------------------------------------------------------- */
 QNodes::QNodes()
 {
-  nodes.clear();
-  ndstr.clear();
-  qs.clear();
-  qe.clear();
-  nqbin.clear();
+   nodes.clear();
+   ndstr.clear();
+   qs.clear();
+   qe.clear();
+   nqbin.clear();
 
-return;
+   return;
 }
 
 /* ----------------------------------------------------------------------------
@@ -20,11 +20,11 @@ return;
  * ---------------------------------------------------------------------------- */
 QNodes::~QNodes()
 {
-  nodes.clear();
-  ndstr.clear();
-  qs.clear();
-  qe.clear();
-  nqbin.clear();
+   nodes.clear();
+   ndstr.clear();
+   qs.clear();
+   qe.clear();
+   nqbin.clear();
 
-return;
+   return;
 }

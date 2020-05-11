@@ -7,10 +7,6 @@
 #include "memory.h"
 #include "interpolate.h"
 
-#ifdef FFTW3
-#include "qnodes.h"
-#endif
-
 class DynMat {
 public:
 
@@ -28,14 +24,13 @@ public:
   void writeDMq(double *, const double, FILE *fp);
   int geteigen(double *, int);
   void reset_interp_method();
-#ifdef FFTW3
-  void phonopy(); // to write the force constants for phonopy
-#endif
 
   doublecomplex **DM_q;
 
   int flag_latinfo;
+  int npt, fftdim2;
   double Tmeasure, basevec[9], ibasevec[9];
+  double *M_inv_sqrt;
   double **basis;
   int *attyp;
 
@@ -45,14 +40,12 @@ private:
   Interpolate *interpolate;
   
   Memory *memory;
-  int npt, fftdim2;
 
   int nasr;
   void EnforceASR();
 
   char *binfile, *dmfile;
   double boltz, q[3];
-  double *M_inv_sqrt;
 
   doublecomplex **DM_all;
 
@@ -61,6 +54,8 @@ private:
   void GaussJordan(int, double *);
 
   void help();
+  void ShowLattice();
   void ShowVersion();
+  void Define_Conversion_Factor();
 };
 #endif

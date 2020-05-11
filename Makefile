@@ -2,9 +2,9 @@
 # compiler and flags
 CC     = g++ -Wno-unused-result
 LINK   = $(CC) -static
-CFLAGS = -O1 $(DEBUG) $(UFLAG)
+CFLAGS = -O3 $(DEBUG) $(UFLAG)
 #
-OFLAGS = -O1 $(DEBUG)
+OFLAGS = -O3 $(DEBUG)
 INC    = $(LPKINC) $(TCINC) $(SPGINC) $(FFTINC)
 LIB    = $(LPKLIB) $(TCLIB) $(SPGLIB) $(FFTLIB)
 #
@@ -25,13 +25,13 @@ SPGLIB = -L/opt/spglib/1.9.7/lib -lsymspg
 # modify file phonon.cpp, instruction can be found by searching 1.8.2
 
 # FFTW 3， used to deduce the force constants in real space
-# if UFLAG is not set, fftw won't be used.
+# if FFLAG is not set, fftw won't be used.
 FFLAG  = -DFFTW3
 FFTINC = -I/opt/fftw/3.3.7/include
 FFTLIB = -L/opt/fftw/3.3.7/lib -lfftw3
 
 # Debug flags
-DEBUG = -g -DDEBUG
+# DEBUG = -g -DDEBUG
 UFLAG = $(SFLAG) $(FFLAG)
 
 #====================================================================
