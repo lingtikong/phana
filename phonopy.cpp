@@ -148,13 +148,14 @@ void Phonopy::phonopy()
 
    fftw_plan plan = fftw_plan_dft_3d(nx, ny, nz, in, out, -1, FFTW_ESTIMATE);
 
+   double factor = dm->eml2fc / double(npt);
    for (int idim = 0; idim < fftdim2; ++idim){
       for (int i = 0; i < npt; ++i){
          in[i][0] = FC_all[i][idim].r;
          in[i][1] = FC_all[i][idim].i;
       }
       fftw_execute(plan);
-      for (int i = 0; i < npt; ++i) fc[i][idim] = out[i][0] * dm->eml2fc / double(npt);
+      for (int i = 0; i < npt; ++i) fc[i][idim] = out[i][0] * factor;
    }
    fftw_destroy_plan(plan);
    memory->destroy(in);
