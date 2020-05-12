@@ -665,7 +665,7 @@ void DynMat::Define_Conversion_Factor()
 
    } else if (fabs(boltz - 0.013806504) <= ZERO){ // nano
       eml2f  = 0.0001591549431;
-      eml2fc = 1.036426965268e-10;
+      eml2fc = 6.241509074460763e-05;
 
    }  else {
      printf("WARNING: Perhaps because of float precision, I cannot get the factor to convert\n");
