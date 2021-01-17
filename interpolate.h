@@ -6,6 +6,7 @@
 #include "string.h"
 #include "memory.h"
 #include "tricubic.h"
+#include "complex.h"
 
 extern "C"{
 #include "f2c.h"
