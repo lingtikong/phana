@@ -19,6 +19,7 @@ DynMat::DynMat(int narg, char **arg)
    attyp = NULL;
    basis = NULL;
    flag_reset_gamma = flag_skip = 0;
+   symprec = -1.;
 
    // analyze the command line options
    int iarg = 1;
@@ -28,6 +29,10 @@ DynMat::DynMat(int narg, char **arg)
   
       } else if (strcmp(arg[iarg], "-r") == 0){
          flag_reset_gamma = 1;
+  
+      } else if (strcmp(arg[iarg], "-p") == 0){
+         if (++iarg >= narg) help();
+         else symprec = fabs(atof(arg[iarg]);
   
       } else if (strcmp(arg[iarg], "-h") == 0){
          help();
@@ -602,6 +607,8 @@ void DynMat::help()
    printf("              will also inform the code to skip all q-points that is in the vicinity\n");
    printf("              of the gamma point when evaluating phonon DOS and/or phonon dispersion.\n\n");
    printf("              By default, this is not set; and not expected for uncharged systems.\n\n");
+   printf("  -p prec     To define the precision for symmetry identification with spglib.\n");
+   printf("              By default, 1.e-3.\n\n");
    printf("  -h          To print out this help info.\n\n");
    printf("  file        To define the filename that carries the binary dynamical matrice generated\n");
    printf("              by fix-phonon. If not provided, the code will ask for it.\n");

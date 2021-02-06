@@ -15,7 +15,7 @@ public:
 
   int nx, ny, nz, nucell;
   int sysdim, fftdim;
-  double eml2f, eml2fc;
+  double eml2f, eml2fc, symprec;
   char *funit;
 
   void getDMq(double *);

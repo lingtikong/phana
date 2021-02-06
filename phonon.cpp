@@ -846,7 +846,8 @@ void Phonon::QMesh()
       shift[0] = shift[1] = shift[2] = 0;
       int num_grid = mesh[0]*mesh[1]*mesh[2];
       int grid_point[num_grid][3], map[num_grid];
-      double symprec = 1.e-4, pos[num_atom][3];
+      double symprec = 1.e-3, pos[num_atom][3];
+      if (dynmat->symprec > 0.) symprec = dynmat->symprec;
   
       for (int i = 0; i < num_atom; ++i)
       for (int j = 0; j < 3; ++j) pos[i][j] = atpos[i][j];

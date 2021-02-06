@@ -1,6 +1,6 @@
-#include "interpolate.h"
 #include "math.h"
 #include "global.h"
+#include "interpolate.h"
 
 /* ----------------------------------------------------------------------------
  * Constructor used to get info from caller, and prepare other necessary data

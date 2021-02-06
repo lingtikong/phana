@@ -47,7 +47,9 @@ kPath::kPath(DynMat *dm, QNodes *qn)
    for (int idim = 0; idim < sysdim; ++idim) atpos[i][idim] = dynmat->basis[i][idim];
  
    // get the space group number
-   double symprec = 1.e-4, pos[num_atom][3];
+   double symprec = 1.e-3, pos[num_atom][3];
+   if (dynmat->symprec > 0.) symprec = dynmat->symprec;
+
    for (int i = 0; i < num_atom; ++i)
    for (int j = 0; j < 3; ++j) pos[i][j] = atpos[i][j];
    spgnum  = spg_get_international(symbol, latvec, pos, attyp, num_atom, symprec);
