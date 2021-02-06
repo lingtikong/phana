@@ -32,7 +32,7 @@ DynMat::DynMat(int narg, char **arg)
   
       } else if (strcmp(arg[iarg], "-p") == 0){
          if (++iarg >= narg) help();
-         else symprec = fabs(atof(arg[iarg]);
+         else symprec = fabs(atof(arg[iarg]));
   
       } else if (strcmp(arg[iarg], "-h") == 0){
          help();
