@@ -221,7 +221,14 @@ void Phonopy::phonopy()
    // write the primitive cell in POSCAR format
    fp = fopen("POSCAR.primitive", "w");
    fprintf(fp, "Fix-phonon unit cell");
-   for (int ip = 0; ip < ntype; ++ip) fprintf(fp, ", Elem-%d: %lg", type_id[ip], mass[ip]);
+   for (int ip = 0; ip < ntype; ++ip){
+     for (int i = 0; i < nucell; ++i){
+       if (dm->attyp[i] == type_id[ip]){
+         fprintf(fp, ", Elem-%d: %lg", type_id[ip], mass[i]);
+         break;
+       }
+     }
+   }
    fprintf(fp, "\n1.\n"); 
    int ndim = 0;
    for (int idim = 0; idim < 3; ++idim){
@@ -250,7 +257,14 @@ void Phonopy::phonopy()
    // band.conf
    fp = fopen("band.conf", "w");
    fprintf(fp, "# From Fix-phonon");
-   for (int ip = 0; ip < ntype; ++ip) fprintf(fp, ", Elem-%d: %lg", type_id[ip], mass[ip]);
+   for (int ip = 0; ip < ntype; ++ip){
+     for (int i = 0; i < nucell; ++i){
+       if (dm->attyp[i] == type_id[ip]){
+         fprintf(fp, ", Elem-%d: %lg", type_id[ip], mass[i]);
+         break;
+       }
+     }
+   }
    fprintf(fp, "\n\nATOM_NAME = ");
    for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]);
    fprintf(fp, "\nDIM = %d %d %d\nBAND = ", nx, ny, nz);
