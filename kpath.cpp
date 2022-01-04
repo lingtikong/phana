@@ -2767,9 +2767,15 @@ void kPath::show_path()
    if (q == NULL) return;
    int nbin = q->ndstr.size();
    if (nbin > 0){
-      printf("\nk-path for the current lattice will be:\n\t%s", q->ndstr[0].c_str());
+      printf("\n"); for (int i = 0; i < 80; ++i) printf("-");
+      printf("\nk-path for the current lattice will be:\n  %s", q->ndstr[0].c_str());
       for (int is = 1; is < nbin; ++is) printf("-%s", q->ndstr[is].c_str());
-      printf("\n");
+
+      printf("\n\nThe fractional coordinates of these nodes are:\n");
+      for (int is = 0; is < nbin-1; ++is)
+         printf("  %s-%s : [%lg %lg %lg]-[%lg %lg %lg]\n", q->ndstr[is].c_str(), q->ndstr[is+1].c_str(),
+         q->qs[is][0], q->qs[is][1], q->qs[is][2], q->qe[is][0], q->qe[is][1], q->qe[is][2]);
+      printf("\n"); for (int i = 0; i < 80; ++i) printf("-");
    }
 
    return;
