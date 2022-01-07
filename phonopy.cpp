@@ -84,10 +84,13 @@ void Phonopy::write(int flag)
    } else if (flag == 4){
       printf("Done!\nThe force constants information is extracted and written to FORCE_CONSTANTS,\n");
       printf("the primitive cell is written to POSCAR.primitive, and the input file for\n");
-      printf("phonopy band evaluation is written to band.conf.\n");
-      printf("One should be able to obtain the phonon band structure after correcting\n");
-      printf("the element names in POSCAR.primitive and band.conf by running\n");
-      printf("`phonopy --readfc -c POSCAR.primitive -p band.conf`.\n");
+      printf("phonopy band evaluation is written to band.conf.\n\n");
+      printf("One should be able to obtain the phonon band structure after\n");
+      printf("  1) Correcting the element names in POSCAR.primitive and band.conf;\n");
+      printf("  2) Running `phonopy --readfc -c POSCAR.primitive -p band.conf`.\n\n");
+      printf("Or the phonon band structure after\n");
+      printf("  1) Correcting the element names in POSCAR.primitive and mesh.conf;\n");
+      printf("  2) Running `phonopy --readfc -c POSCAR.primitive -p mesh.conf`.\n");
       for (int ii = 0; ii < 80; ++ii) printf("-");
       printf("\n***          Remember to change the element names.           ***\n");
 #ifdef UseSPG
@@ -254,6 +257,24 @@ void Phonopy::phonopy()
    kp->kpath();
 #endif
    
+   // mesh.conf
+   fp = fopen("mesh.conf", "w");
+   fprintf(fp, "# From Fix-phonon");
+   for (int ip = 0; ip < ntype; ++ip){
+     for (int i = 0; i < nucell; ++i){
+       if (dm->attyp[i] == type_id[ip]){
+         fprintf(fp, ", Elem-%d: %lg", type_id[ip], mass[i]);
+         break;
+       }
+     }
+   }
+   fprintf(fp, "\n\nATOM_NAME = ");
+   for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]);
+   fprintf(fp, "\nDIM = %d %d %d\n", nx, ny, nz);
+   fprintf(fp, "MP  = 51 51 51\nFORCE_CONSTANTS = READ\n");
+   fclose(fp);
+
+
    // band.conf
    fp = fopen("band.conf", "w");
    fprintf(fp, "# From Fix-phonon");
