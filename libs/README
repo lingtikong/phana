@@ -16,7 +16,7 @@
       sudo cp F2CLIBS/*.a /opt/clapack/3.2.1/lib/
       ln -s /opt/clapack/3.2.1/lib/blas_LINUX.a    /opt/clapack/3.2.1/lib/libblas.a
       ln -s /opt/clapack/3.2.1/lib/lapack_LINUX.a  /opt/clapack/3.2.1/lib/liblapack.a
-      ln -s /opt/clapack/3.2.1/lib/clapack_LINUX.a /opt/clapack/3.2.1/lib/libclapack.a
+      ln -s /opt/clapack/3.2.1/lib/lapack_LINUX.a /opt/clapack/3.2.1/lib/libclapack.a
 
 2. Installation of libtricubic
    1) Unpack

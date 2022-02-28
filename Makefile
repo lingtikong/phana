@@ -19,7 +19,7 @@ TCLIB = -L/opt/tricubic/1.0/lib -ltricubic
 # spglib, used to get the irreducible q-points
 # if SFLAG is not set, spglib won't be used.
 SFLAG  = -DUseSPG
-SPGINC = -I/opt/spglib/1.9.7/include/spglib
+SPGINC = -I/opt/spglib/1.9.7/include
 SPGLIB = -L/opt/spglib/1.9.7/lib -lsymspg
 
 # FFTW 3， used to deduce the force constants in real space
