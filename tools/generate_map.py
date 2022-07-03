@@ -54,8 +54,7 @@ if __name__ == "__main__":
 
     ang_diff = np.array(structure.lattice.angles) - np.array(primitive.lattice.angles)
     if np.sqrt(np.sum(ang_diff * ang_diff)) > args.angtol:
-       print("\nIt seems that the supercell and the identified primitive cell differ too much, the mission cannot be proceeded!\n")
-       exit()
+       print("\nWARNING: It seems that the supercell and the identified primitive cell differ\ntoo much, the result might not be reliable!\n")
 
     nx = int((structure.lattice.a + args.symprec)/primitive.lattice.a)
     ny = int((structure.lattice.b + args.symprec)/primitive.lattice.b)
