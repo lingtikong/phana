@@ -35,7 +35,7 @@ if __name__ == "__main__":
         print(f"\nFile {args.file} required but not found!\n")
    
     elif args.style.lower() == 'poscar':
-        poscar = Poscar.from_file(args.poscar)
+        poscar = Poscar.from_file(args.file)
         structure = poscar.structure
 
     else:
