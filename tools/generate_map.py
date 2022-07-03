@@ -52,20 +52,24 @@ if __name__ == "__main__":
     print(f"\nThe lattice parameters of the supercell are:\n  {structure.lattice.parameters}")
     print(f"\nThe lattice parameters of the primitive cell are:\n  {primitive.lattice.parameters}")
 
-    if np.sqrt(np.sum(np.array(structure.lattice.angles) - np.array(primitive.lattice.angles))) > args.angtol:
+    ang_diff = np.array(structure.lattice.angles) - np.array(primitive.lattice.angles)
+    if np.sqrt(np.sum(ang_diff * ang_diff)) > args.angtol:
        print("\nIt seems that the supercell and the identified primitive cell differ too much, the mission cannot be proceeded!\n")
+       exit()
 
     nx = int((structure.lattice.a + args.symprec)/primitive.lattice.a)
     ny = int((structure.lattice.b + args.symprec)/primitive.lattice.b)
     nz = int((structure.lattice.c + args.symprec)/primitive.lattice.c)
     if nx < 1 or ny < 1 or nz < 1:
        print(f"Your supercell does not seem to be a simple repetition of the primitive one, the mission cannot be proceeded!\n")
+       exit()
 
     nucell = primitive.num_sites
     if nx*ny*nz*nucell != structure.num_sites:
        print(f"Your supercell does not seem to be a simple repetition of the primitive one, the mission cannot be proceeded!\n")
+       exit()
 
-    print(f"\nYour supercell contains {nx}x{ny}x{nz} primitive cells, each of {nucell} atoms.")
+    print(f"\nYour supercell contains {nx} x {ny} x {nz} primitive cells, each of {nucell} atoms.")
 
     map2prim = sa.get_symmetry_dataset()['mapping_to_primitive']
     id_prim = dict()
