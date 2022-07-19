@@ -13,7 +13,7 @@ if __name__ == "__main__":
     differ from the one by latgen (https://github.com/lingtikong/latgen) but should work as well.
 
     For help, please use:
-        python generate_map -h
+        python generate_map.py -h
 
     (C) LT Kong (konglt@sjtu.edu.cn)
     July 2022
@@ -65,7 +65,13 @@ if __name__ == "__main__":
 
     nucell = primitive.num_sites
     if nx*ny*nz*nucell != structure.num_sites:
-       print(f"Your supercell does not seem to be a simple repetition of the primitive one, the mission cannot be proceeded!\n")
+       print("Your supercell does not seem to be a simple repetition of the primitive one, the mission cannot be proceeded!\n")
+       print("\nIf you like, I will output a POSCAR for the primitive cell, which can be used as an input to")
+       print("latgen (https://github.com/lingtikong/latgen; option 7) to generate the compatible data and map files.")
+       ans = input("\nIs this what you want? (y/n)[n]: ")
+       if ans[0] in ('y', 'Y'):
+          primitive.to(fmt="poscar", filename="POSCAR")
+          print("Primitive cell info written to POSCAR.\n")
        exit()
 
     print(f"\nYour supercell contains {nx} x {ny} x {nz} primitive cells, each of {nucell} atoms.")
