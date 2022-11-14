@@ -5,6 +5,7 @@
 #include "green.h"
 #include "timer.h"
 #include "kpath.h"
+#include <math.h>
 
 /*------------------------------------------------------------------------------
  * Private method to evaluate the phonon dispersion curves

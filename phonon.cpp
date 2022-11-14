@@ -406,8 +406,8 @@ void Phonon::dmanyq()
 {
    char str[MAXLINE];
    double q[3];
-   do printf("Please input the q-point to output the dynamical matrix:");
    while ( 1 ){
+      printf("Please input the q-point to output the dynamical matrix: ");
       input->read_stdin(str);
       if (count_words(str) >= 3) break;
    }

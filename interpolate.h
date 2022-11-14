@@ -7,13 +7,11 @@
 #include "memory.h"
 #include "tricubic.h"
 #include "input.h"
-#include <complex>
 
 extern "C" {
 #include "f2c.h"
 #include "clapack.h"
 }
-
 
 class Interpolate{
 public:
