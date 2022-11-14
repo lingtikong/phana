@@ -617,6 +617,7 @@ void DynMat::help()
    printf("              By default, this is not set; and not expected for uncharged systems.\n\n");
    printf("  -p prec     To define the precision for symmetry identification with spglib.\n");
    printf("              By default, 1.e-3.\n\n");
+   printf("  -save       To record user input in `script.inp`, facilitating scripting.\n\n");
    printf("  -h          To print out this help info.\n\n");
    printf("  file        To define the filename that carries the binary dynamical matrice generated\n");
    printf("              by fix-phonon. If not provided, the code will ask for it.\n");

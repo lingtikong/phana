@@ -1,6 +1,6 @@
 .SUFFIXES : .o .cpp
 # compiler and flags
-CC     = g++ -Wno-unused-result
+CC     = g++ -Wno-unused-result -fopenmp
 LINK   = $(CC) -static
 CFLAGS = -O3 $(DEBUG) $(UFLAG)
 
@@ -19,8 +19,8 @@ TCLIB = -L/opt/tricubic/1.0/lib -ltricubic
 # spglib, used to get the irreducible q-points
 # if SFLAG is not set, spglib won't be used.
 SFLAG  = -DUseSPG
-SPGINC = -I/opt/spglib/1.9.7/include/spglib
-SPGLIB = -L/opt/spglib/1.9.7/lib -lsymspg
+SPGINC = -I/opt/spglib/1.16.5/include
+SPGLIB = -L/opt/spglib/1.16.5/lib -lsymspg
 
 # FFTW 3， used to deduce the force constants in real space
 # if FFLAG is not set, fftw won't be used.
