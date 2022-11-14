@@ -6,6 +6,7 @@
 #include "string.h"
 #include "memory.h"
 #include "interpolate.h"
+#include "input.h"
 
 class DynMat {
 public:
@@ -33,6 +34,8 @@ public:
   double *M_inv_sqrt;
   double **basis;
   int *attyp;
+
+  UserInput *input;
 
 private:
 

@@ -6,12 +6,14 @@
 #include "string.h"
 #include "memory.h"
 #include "tricubic.h"
+#include "input.h"
 #include <complex>
 
-extern "C"{
+extern "C" {
 #include "f2c.h"
 #include "clapack.h"
 }
+
 
 class Interpolate{
 public:
@@ -23,6 +25,8 @@ public:
    void reset_gamma();
  
    int UseGamma;
+
+   UserInput *input;
 
 private:
    void tricubic_init();

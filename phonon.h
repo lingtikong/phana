@@ -6,6 +6,7 @@
 #include <complex>
 #include "dynmat.h"
 #include "memory.h"
+#include "input.h"
 
 using namespace std;
 
@@ -17,6 +18,8 @@ public:
    DynMat *dynmat;
  
 private:
+   UserInput *input;
+
    int nq, ndim, sysdim;
    double **qpts, *wt;
    double **eigs;

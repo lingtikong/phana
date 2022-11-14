@@ -14,13 +14,16 @@ Phonopy::Phonopy(DynMat *dynmat)
    memory = new Memory();
    sysdim = dm->sysdim;
    fftdim = dm->fftdim;
+   input  = dm->input;
    fftdim2 = fftdim * fftdim;
    nucell = dm->nucell;
    nx = ny = nz = 5;
    write(1);
 
    char str[MAXLINE];
-   if (count_words(fgets(str,MAXLINE,stdin)) >= 3){
+   if (input == NULL) input = new UserInput(0);
+   input->read_stdin(str);
+   if (count_words(str) >= 3){
       nx = atoi(strtok(str," \t\n\r\f"));
       ny = atoi(strtok(NULL," \t\n\r\f"));
       nz = atoi(strtok(NULL," \t\n\r\f"));

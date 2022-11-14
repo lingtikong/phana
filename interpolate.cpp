@@ -19,6 +19,7 @@ Interpolate::Interpolate(int nx, int ny, int nz, int ndm, doublecomplex **DM)
    data = DM;
    Dfdx = Dfdy = Dfdz = D2fdxdy = D2fdxdz = D2fdydz = D3fdxdydz = NULL;
    flag_reset_gamma = flag_allocated_dfs = 0;
+   input = NULL;
  
    return;
 }
@@ -265,11 +266,13 @@ void Interpolate::set_method()
 {
    char str[MAXLINE];
    int im = 1;
+   if (input == NULL) input = new UserInput(0);
+
    printf("\n");for(int i=0; i<80; i++) printf("=");
    printf("\nWhich interpolation method would you like to use?\n");
    printf("  1. Tricubic;\n  2. Trilinear;\n");
    printf("Your choice [1]: ");
-   fgets(str,MAXLINE,stdin);
+   input->read_stdin(str);
    char *ptr = strtok(str," \t\n\r\f");
    if (ptr) im = atoi(ptr);
  

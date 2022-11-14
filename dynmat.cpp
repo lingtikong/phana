@@ -9,6 +9,7 @@
  * ---------------------------------------------------------------------------- */
 DynMat::DynMat(int narg, char **arg)
 {
+   input = NULL;
    attyp = NULL;
    memory = NULL;
    M_inv_sqrt = NULL;
@@ -20,6 +21,7 @@ DynMat::DynMat(int narg, char **arg)
    basis = NULL;
    flag_reset_gamma = flag_skip = 0;
    symprec = -1.;
+   int flag_save = 0;
 
    // analyze the command line options
    int iarg = 1;
@@ -37,6 +39,9 @@ DynMat::DynMat(int narg, char **arg)
       } else if (strcmp(arg[iarg], "-h") == 0){
          help();
   
+      } else if (strcmp(arg[iarg], "-save") == 0){
+        flag_save = 1;
+  
       } else {
          if (binfile) delete []binfile;
          int n = strlen(arg[iarg]) + 1;
@@ -48,6 +53,8 @@ DynMat::DynMat(int narg, char **arg)
    }
  
    ShowVersion();
+   input = new UserInput(flag_save);
+
    // get the binary file name from user input if not found in command line
    char str[MAXLINE];
    if (binfile == NULL) {
@@ -55,7 +62,7 @@ DynMat::DynMat(int narg, char **arg)
       printf("\n");
       do {
          printf("Please input the binary file name from fix_phonon: ");
-         fgets(str,MAXLINE,stdin);
+         input->read_stdin(str);
          ptr = strtok(str, " \n\t\r\f");
       } while (ptr == NULL);
   
@@ -164,6 +171,7 @@ DynMat::DynMat(int narg, char **arg)
 
    // initialize interpolation
    interpolate = new Interpolate(nx,ny,nz,fftdim2,DM_all);
+   interpolate->input = input;
    if (flag_reset_gamma) interpolate->reset_gamma();
 
    // Enforcing Austic Sum Rule
@@ -222,7 +230,7 @@ void DynMat::writeDMq(double *q)
       printf("\n");
       while ( 1 ){
          printf("Please input the filename to output the DM at selected q: ");
-         fgets(str,MAXLINE,stdin);
+         input->read_stdin(str);
          ptr = strtok(str, " \r\t\n\f");
          if (ptr) break;
       }
@@ -375,7 +383,7 @@ void DynMat::EnforceASR()
  
    // ask for iterations to enforce ASR
    printf("Please input the # of iterations to enforce ASR [%d]: ", nasr);
-   fgets(str,MAXLINE,stdin);
+   input->read_stdin(str);
    char *ptr = strtok(str," \t\n\r\f");
    if (ptr) nasr = atoi(ptr);
    if (nasr < 1){

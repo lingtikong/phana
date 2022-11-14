@@ -11,6 +11,7 @@
 #include "qnodes.h"
 #include "dynmat.h"
 #include "global.h"
+#include "input.h"
 
 class Phonopy {
 public:
@@ -18,6 +19,7 @@ public:
    ~Phonopy();
 
 private:
+   UserInput *input;
    Memory *memory;
    char str[MAXLINE];
    int npt, fftdim2;       // local variables
