@@ -59,7 +59,6 @@ Green::Green(const int ntm, const int sdim, const int niter, const double min, c
    dw = (wmax - wmin)/double(nw-1);
    memory->create(alpha, sysdim,nit,  "Green_Green:alpha");
    memory->create(beta,  sysdim,nit+1,"Green_Green:beta");
-   //memory->create(ldos,  nw,sysdim, "Green_Green:ldos");
  
    // use Lanczos algorithm to diagonalize the Hessian
    Lanczos();

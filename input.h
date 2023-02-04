@@ -2,11 +2,6 @@
 #define INPUT_H
 
 #include <stdio.h>
-#include <string>
-#include <vector>
-#include <string.h>
-
-using namespace std;
 
 class UserInput {
 public:

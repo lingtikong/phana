@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+#include <string>
 #include "memory.h"
 #include "tricubic.h"
 #include "input.h"

@@ -2,11 +2,13 @@
 #include "global.h"
 
 /* -------------------------------------------------------------------
- * Constructor. If flag = 1, output user inputs as stdin.log
+ * Constructor. If flag = 1, output user inputs as script.inp
  * ---------------------------------------------------------------- */ 
 UserInput::UserInput(int flag)
 {
+   fp = NULL;
    if (flag) fp = fopen("script.inp", "w");
+
    return;
 }
 

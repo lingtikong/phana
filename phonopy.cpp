@@ -91,7 +91,7 @@ void Phonopy::write(int flag)
       printf("One should be able to obtain the phonon band structure after\n");
       printf("  1) Correcting the element names in POSCAR.primitive and band.conf;\n");
       printf("  2) Running `phonopy --readfc -c POSCAR.primitive -p band.conf`.\n\n");
-      printf("Or the phonon band structure after\n");
+      printf("Or the phonon density of states after\n");
       printf("  1) Correcting the element names in POSCAR.primitive and mesh.conf;\n");
       printf("  2) Running `phonopy --readfc -c POSCAR.primitive -p mesh.conf`.\n");
       for (int ii = 0; ii < 80; ++ii) printf("-");
