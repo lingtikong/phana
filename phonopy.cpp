@@ -96,9 +96,6 @@ void Phonopy::write(int flag)
       printf("  2) Running `phonopy --readfc -c POSCAR.primitive -p mesh.conf`.\n");
       for (int ii = 0; ii < 80; ++ii) printf("-");
       printf("\n***          Remember to change the element names.           ***\n");
-#ifdef UseSPG
-      for (int ii = 0; ii < 80; ++ii) printf("-");
-#endif
 
    } else if (flag == 5){
       for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
@@ -253,13 +250,6 @@ void Phonopy::phonopy()
    }
    fclose(fp);
 
-#ifdef UseSPG
-  // Get high symmetry k-path
-   QNodes *q = new QNodes();
-   kPath *kp = new kPath(dm, q);
-   kp->kpath();
-#endif
-   
    // mesh.conf
    fp = fopen("mesh.conf", "w");
    fprintf(fp, "# From Fix-phonon");
@@ -274,7 +264,7 @@ void Phonopy::phonopy()
    fprintf(fp, "\n\nATOM_NAME = ");
    for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]);
    fprintf(fp, "\nDIM = %d %d %d\n", nx, ny, nz);
-   fprintf(fp, "MP  = 51 51 51\nFORCE_CONSTANTS = READ\n");
+   fprintf(fp, "MP  = 51 51 51\nFORCE_CONSTANTS = READ\n#SYMMETRY_TOLERANCE = 0.01\n");
    fclose(fp);
 
 
@@ -291,41 +281,12 @@ void Phonopy::phonopy()
    }
    fprintf(fp, "\n\nATOM_NAME = ");
    for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]);
-   fprintf(fp, "\nDIM = %d %d %d\nBAND = ", nx, ny, nz);
-#ifdef UseSPG
-   int nsect = q->qs.size();
-   for (int i = 0; i < nsect; ++i){
-      fprintf(fp, " %lg %lg %lg", q->qs[i][0], q->qs[i][1], q->qs[i][2]);
-      if (i+1 < nsect){
-         double dq = 0.;
-         for (int j = 0; j < 3; ++j) dq += (q->qe[i][j] - q->qs[i+1][j]) * (q->qe[i][j] - q->qs[i+1][j]);
-         if (dq > ZERO) {
-            fprintf(fp, " %lg %lg %lg,", q->qe[i][0], q->qe[i][1], q->qe[i][2]);
-         }
-      } else if (i+1 == nsect){
-         fprintf(fp, " %lg %lg %lg\n", q->qe[i][0], q->qe[i][1], q->qe[i][2]);
-      }
-   }
-#endif
-   fprintf(fp, "\nBAND_POINTS = 21\nBAND_LABELS =");
-#ifdef UseSPG
-   for (int i = 0; i < q->ndstr.size(); ++i){
-      std::size_t found = q->ndstr[i].find("{/Symbol G}");
-      if (found != std::string::npos) q->ndstr[i].replace(found, found+11, "$\\Gamma$");
-      found = q->ndstr[i].find("/");
-      if (found != std::string::npos) q->ndstr[i].replace(found, found, " ");
-      fprintf(fp, " %s", q->ndstr[i].c_str());
-   }
-#endif
-   fprintf(fp, "\nFORCE_CONSTANTS = READ\nBAND_CONNECTION = .TRUE.\n");
+   fprintf(fp, "\nDIM = %d %d %d\nBAND = AUTO\n", nx, ny, nz);
+   fprintf(fp, "\nBAND_POINTS = 21\n");
+   fprintf(fp, "\nFORCE_CONSTANTS = READ\nBAND_CONNECTION = .TRUE.\n#SYMMETRY_TOLERANCE = 0.01\n");
 
    // output info
    write(4);
-#ifdef UseSPG
-   kp->show_path();
-   delete kp;
-   delete q;
-#endif
    write(5);
 
 return;
