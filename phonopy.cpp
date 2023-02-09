@@ -89,13 +89,13 @@ void Phonopy::write(int flag)
       printf("the primitive cell is written to POSCAR.primitive, and the input file for\n");
       printf("phonopy band evaluation is written to band.conf.\n\n");
       printf("One should be able to obtain the phonon band structure after\n");
-      printf("  1) Correcting the element names in POSCAR.primitive and band.conf;\n");
+      printf("  1) Correcting the `element names` in POSCAR.primitive and band.conf;\n");
       printf("  2) Running `phonopy --readfc -c POSCAR.primitive -p band.conf`.\n\n");
       printf("Or the phonon density of states after\n");
-      printf("  1) Correcting the element names in POSCAR.primitive and mesh.conf;\n");
+      printf("  1) Correcting the `element names` in POSCAR.primitive and mesh.conf;\n");
       printf("  2) Running `phonopy --readfc -c POSCAR.primitive -p mesh.conf`.\n");
       for (int ii = 0; ii < 80; ++ii) printf("-");
-      printf("\n***          Remember to change the element names.           ***\n");
+      printf("\n***         Remember to change the `element names`.          ***\n");
 
    } else if (flag == 5){
       for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
@@ -282,8 +282,8 @@ void Phonopy::phonopy()
    fprintf(fp, "\n\nATOM_NAME = ");
    for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]);
    fprintf(fp, "\nDIM = %d %d %d\nBAND = AUTO\n", nx, ny, nz);
-   fprintf(fp, "\nBAND_POINTS = 21\n");
-   fprintf(fp, "\nFORCE_CONSTANTS = READ\nBAND_CONNECTION = .TRUE.\n#SYMMETRY_TOLERANCE = 0.01\n");
+   fprintf(fp, "BAND_POINTS = 21\n");
+   fprintf(fp, "FORCE_CONSTANTS = READ\nBAND_CONNECTION = .TRUE.\n#SYMMETRY_TOLERANCE = 0.01\n");
 
    // output info
    write(4);
