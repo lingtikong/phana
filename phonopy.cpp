@@ -95,7 +95,7 @@ void Phonopy::write(int flag)
       printf("  1) Correcting the `element names` in POSCAR.primitive and mesh.conf;\n");
       printf("  2) Running `phonopy --readfc -c POSCAR.primitive -p mesh.conf`.\n");
       for (int ii = 0; ii < 80; ++ii) printf("-");
-      printf("\n***         Remember to change the `element names`.          ***\n");
+      printf("\n***         Remember to modify the `element names`.          ***\n");
 
    } else if (flag == 5){
       for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
@@ -264,7 +264,8 @@ void Phonopy::phonopy()
    fprintf(fp, "\n\nATOM_NAME = ");
    for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]);
    fprintf(fp, "\nDIM = %d %d %d\n", nx, ny, nz);
-   fprintf(fp, "MP  = 51 51 51\nFORCE_CONSTANTS = READ\n#SYMMETRY_TOLERANCE = 0.01\n");
+   fprintf(fp, "MP  = 31 31 31\nFORCE_CONSTANTS = READ\n");
+   fprintf(fp, "#FC_SYMMETRY = .TRUE.\n#SYMMETRY_TOLERANCE = 0.01\n");
    fclose(fp);
 
 
@@ -282,8 +283,8 @@ void Phonopy::phonopy()
    fprintf(fp, "\n\nATOM_NAME = ");
    for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]);
    fprintf(fp, "\nDIM = %d %d %d\nBAND = AUTO\n", nx, ny, nz);
-   fprintf(fp, "BAND_POINTS = 21\n");
-   fprintf(fp, "FORCE_CONSTANTS = READ\nBAND_CONNECTION = .TRUE.\n#SYMMETRY_TOLERANCE = 0.01\n");
+   fprintf(fp, "BAND_POINTS = 21\nFORCE_CONSTANTS = READ\nBAND_CONNECTION = .TRUE.\n");
+   fprintf(fp, "#FC_SYMMETRY = .TRUE.\n#SYMMETRY_TOLERANCE = 0.01\n");
 
    // output info
    write(4);
