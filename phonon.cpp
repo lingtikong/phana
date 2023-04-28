@@ -287,7 +287,7 @@ void Phonon::ldos_rsgf()
   
       fmin = fmax = egvs[0];
       for (int i = 1; i < ndim; ++i){fmin = MIN(fmin, egvs[i]); fmax = MAX(fmax, egvs[i]);}
-      delete []egvs;
+      delete[] egvs;
 
    } else {
      fmin = 0.; fmax = 20.;
@@ -427,7 +427,8 @@ void Phonon::dmanyq()
 void Phonon::vfanyq()
 {
    char str[MAXLINE];
-   double q[3], egvs[ndim];
+   double q[3];
+   double *egvs = new double[ndim];
    
    while ( 1 ){
       printf("Please input the q-point to compute the frequencies, q to exit: ");
@@ -444,7 +445,8 @@ void Phonon::vfanyq()
       printf("vibrational frequencies at this q-point:\n");
       for (int i = 0; i < ndim; ++i) printf("%lg ", egvs[i]); printf("\n\n");
    }
- 
+
+   delete[] egvs;
    return;
 }
 
@@ -454,7 +456,8 @@ void Phonon::vfanyq()
 void Phonon::vecanyq()
 {
    char str[MAXLINE];
-   double q[3], egvs[ndim];
+   double q[3];
+   double *egvs = new double[ndim];
    doublecomplex **eigvec = dynmat->DM_q;
    printf("Please input the filename to output the result [eigvec.dat]: ");
    input->read_stdin(str);
@@ -492,6 +495,7 @@ void Phonon::vecanyq()
       fprintf(fp,"\n");
    }
    fclose(fp);
+   delete[] egvs;
    eigvec = NULL;
    return;
 }
