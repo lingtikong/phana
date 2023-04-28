@@ -8,7 +8,7 @@
 
 extern "C" {
 
-static constexpr int BUFSZ = 1024;
+static const int BUFSZ = 1024;
 
 integer xerbla_(const char *srname, integer *info)
 {
