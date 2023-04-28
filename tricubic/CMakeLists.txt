@@ -15,3 +15,4 @@ if(MSVC)
 endif()
 
 add_library(tricubic STATIC tricubic.cpp)
+target_include_directories(tricubic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

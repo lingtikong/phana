@@ -1,7 +1,11 @@
+
 #include "dynmat.h"
-#include "math.h"
 #include "version.h"
 #include "global.h"
+
+#include "zheevd.h"
+
+#include <cmath>
 
 /* ----------------------------------------------------------------------------
  * Class DynMat stores the Dynamic Matrix read from the binary file from
@@ -277,9 +281,9 @@ void DynMat::writeDMq(double *q, const double qr, FILE *fp)
 int DynMat::geteigen(double *egv, int flag)
 {
    char jobz, uplo;
-   integer n, lda, lwork, lrwork, *iwork, liwork, info;
+   int n, lda, lwork, lrwork, *iwork, liwork, info;
    doublecomplex *work;
-   doublereal *w = &egv[0], *rwork;
+   double *w = &egv[0], *rwork;
 
    n = fftdim;
    if (flag) jobz = 'V';
