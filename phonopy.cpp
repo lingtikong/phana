@@ -168,7 +168,9 @@ void Phonopy::phonopy()
    memory->destroy(out);
 
    // in POSCAR, atoms are sorted/aggregated by type, while for LAMMPS there is no such requirment
-   int type_id[nucell], num_type[nucell], ntype = 0;
+   int *type_id = new int[nucell];
+   int *num_type = new int[nucell];
+   int ntype = 0;
    for (int i = 0; i < nucell; ++i) num_type[i] = 0;
    for (int i = 0; i < nucell; ++i){
       int ip = ntype;
@@ -292,8 +294,9 @@ void Phonopy::phonopy()
    // output info
    write(4);
    write(5);
-
-return;
+   delete[] type_id;
+   delete[] num_type;
+   return;
 }
 
 /*------------------------------------------------------------------------------
