@@ -525,7 +525,7 @@ void DynMat::GaussJordan(int n, double *Mat)
             for (k = 0; k < n; ++k){
                if (ipiv[k] == 0){
                   idr = j * n + k;
-                  nmjk = abs(Mat[idr]);
+                  nmjk = fabs(Mat[idr]);
                   if (nmjk >= big){
                      big  = nmjk;
                      irow = j;
