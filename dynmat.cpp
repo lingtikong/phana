@@ -1,11 +1,16 @@
 
 #include "dynmat.h"
 
-#include "version.h"
 #include "global.h"
+#include "input.h"
+#include "interpolate.h"
+#include "memory.h"
+#include "version.h"
 #include "zheevd.h"
 
 #include <cmath>
+#include <cstdlib>
+#include <cstring>
 
 /* ----------------------------------------------------------------------------
  * Class DynMat stores the Dynamic Matrix read from the binary file from

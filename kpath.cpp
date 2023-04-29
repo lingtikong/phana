@@ -2,12 +2,18 @@
 #include "kpath.h"
 
 #include "global.h"
+#include "dynmat.h"
+#include "memory.h"
+#include "qnodes.h"
 
 #ifdef UseSPG
 extern "C"{
 #include "spglib.h"
 }
 #include <cmath>
+#include <cstdio>
+#include <string>
+#include <vector>
 
 /* ----------------------------------------------------------------------------
  * Class kPath will help to find the high symmetry k-path for a given lattice.

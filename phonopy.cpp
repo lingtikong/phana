@@ -2,11 +2,18 @@
 #ifdef FFTW3
 
 #include "phonopy.h"
-#include "kpath.h"
+
+#include "global.h"
+#include "dynmat.h"
+#include "input.h"
+#include "memory.h"
 
 #include <fftw3.h>
 
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <map>
 
 /* ----------------------------------------------------------------------------
@@ -43,7 +50,7 @@ Phonopy::Phonopy(DynMat *dynmat)
 
    memory->create(mass, nucell, "Phonopy:mass");
    for (int i = 0; i < nucell; ++i){
-      double m = 1./dm->M_inv_sqrt[i];
+      double m = 1.0/dm->M_inv_sqrt[i];
       mass[i] = m * m;
    }
 
@@ -310,7 +317,7 @@ int Phonopy::count_words(const char *line)
    strcpy(copy,line);
   
    char *ptr;
-   if (ptr = strchr(copy,'#')) *ptr = '\0';
+   if ((ptr = strchr(copy,'#'))) *ptr = '\0';
   
    if (strtok(copy," \t\n\r\f") == NULL) {
      memory->destroy(copy);
@@ -320,7 +327,7 @@ int Phonopy::count_words(const char *line)
    while (strtok(NULL," \t\n\r\f")) n++;
   
    memory->destroy(copy);
-return n;
+   return n;
 }
 /*----------------------------------------------------------------------------*/
 #endif
