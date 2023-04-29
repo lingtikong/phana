@@ -243,7 +243,7 @@ void Phonon::writeLDOS()
    const double one3 = 1./double(sysdim);
    char str[MAXLINE];
    for (int ilocal = 0; ilocal < nlocal; ++ilocal){
-      sprintf(str,"pldos_%d.dat", locals[ilocal]);
+      snprintf(str, MAXLINE-1, "pldos_%d.dat", locals[ilocal]);
       char *fname = strtok(str," \t\n\r\f");
   
       FILE *fp = fopen(fname, "w"); fname = NULL;
