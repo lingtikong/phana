@@ -25,7 +25,7 @@ private:
   DynMat *dynmat;
   QNodes *q;
   char symbol[11];
-  int spgnum, sysdim, fftdim, num_atom, *attyp;
+  int spgnum, sysdim, num_atom, *attyp;
   double latvec[3][3], **atpos;
 
 };

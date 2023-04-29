@@ -21,7 +21,6 @@ public:
 private:
    UserInput *input;
    Memory *memory;
-   char str[MAXLINE];
    int npt, fftdim2;       // local variables
    int nx, ny, nz, nucell; // local variables
    int sysdim, fftdim;     // local variables

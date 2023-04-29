@@ -41,11 +41,10 @@ private:
   
   Memory *memory;
 
-  int nasr;
   void EnforceASR();
 
   char *binfile, *dmfile;
-  double boltz, q[3];
+  double boltz;
 
   doublecomplex **DM_all;
 

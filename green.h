@@ -14,7 +14,6 @@ private:
    void Recursion();
    void recursion();
  
-   int ndos;
    double **ldos;
  
    int natom, iatom, sysdim, nit, nw, ndim;
