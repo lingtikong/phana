@@ -1,15 +1,18 @@
 
 #include "phonon.h"
 
-#include "green.h"
 #include "global.h"
+#include "dynmat.h"
+#include "green.h"
+#include "input.h"
+#include "memory.h"
 #include "timer.h"
+#include "zheevd.h"
 
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <vector>
 
 #ifdef UseSPG
 extern "C"{

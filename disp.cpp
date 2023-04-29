@@ -1,17 +1,18 @@
 
 #include "phonon.h"
 
+#include "dynmat.h"
 #include "global.h"
-#include "green.h"
+#include "input.h"
 #include "kpath.h"
 #include "qnodes.h"
 
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
-#include <ctime>
-
-using namespace std;
+#include <string>
+#include <vector>
 
 /*------------------------------------------------------------------------------
  * Private method to evaluate the phonon dispersion curves

@@ -1,11 +1,16 @@
 
 #include "dynmat.h"
 
-#include "version.h"
 #include "global.h"
+#include "input.h"
+#include "interpolate.h"
+#include "memory.h"
+#include "version.h"
 #include "zheevd.h"
 
 #include <cmath>
+#include <cstdlib>
+#include <cstring>
 
 /* ----------------------------------------------------------------------------
  * Class DynMat stores the Dynamic Matrix read from the binary file from
@@ -525,7 +530,7 @@ void DynMat::GaussJordan(int n, double *Mat)
             for (k = 0; k < n; ++k){
                if (ipiv[k] == 0){
                   idr = j * n + k;
-                  nmjk = abs(Mat[idr]);
+                  nmjk = fabs(Mat[idr]);
                   if (nmjk >= big){
                      big  = nmjk;
                      irow = j;

@@ -1,9 +1,9 @@
 #ifndef DYNMAT_H
 #define DYNMAT_H
 
-#include "memory.h"
-#include "interpolate.h"
-#include "input.h"
+#include "zheevd.h"
+
+#include <cstdio>
 
 class DynMat {
 public:
@@ -32,20 +32,18 @@ public:
   double **basis;
   int *attyp;
 
-  UserInput *input;
+  class UserInput *input;
 
 private:
 
   int flag_skip, flag_reset_gamma;
-  Interpolate *interpolate;
-  
-  Memory *memory;
+  class Interpolate *interpolate;
+  class Memory *memory;
 
-  int nasr;
   void EnforceASR();
 
   char *binfile, *dmfile;
-  double boltz, q[3];
+  double boltz;
 
   doublecomplex **DM_all;
 
