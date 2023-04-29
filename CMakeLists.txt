@@ -9,7 +9,7 @@ if(POLICY CMP0135)
 endif()
 
 # set up project
-project(phana VERSION 47 DESCRIPTION "Fix phonon post-processor" LANGUAGES CXX C)
+project(phana VERSION 48 DESCRIPTION "Fix phonon post-processor" LANGUAGES CXX C)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
