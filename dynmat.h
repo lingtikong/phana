@@ -1,9 +1,6 @@
 #ifndef DYNMAT_H
 #define DYNMAT_H
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
 #include "memory.h"
 #include "interpolate.h"
 #include "input.h"

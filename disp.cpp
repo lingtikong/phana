@@ -1,11 +1,17 @@
-#include "string.h"
-#include "qnodes.h"
-#include "global.h"
+
 #include "phonon.h"
+
+#include "global.h"
 #include "green.h"
-#include "timer.h"
 #include "kpath.h"
-#include <math.h>
+#include "qnodes.h"
+
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <ctime>
+
+using namespace std;
 
 /*------------------------------------------------------------------------------
  * Private method to evaluate the phonon dispersion curves
@@ -14,7 +20,8 @@ void Phonon::pdisp()
 {
   // ask the output file name and write the header.
    char str[MAXLINE];
-   for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
+   puts("================================================================================");
+
 #ifdef UseSPG
   // ask method to generate q-lines
    int method = 2;
@@ -48,7 +55,6 @@ void Phonon::pdisp()
       while (1){
          for (int i = 0; i < 3; ++i) qstr[i] = qend[i];
    
-         int quit = 0;
          printf("\nPlease input the start q-point in unit of B1->B3, q to exit [%g %g %g]: ", qstr[0], qstr[1], qstr[2]);
          input->read_stdin(str);
          int n = count_words(str);
@@ -155,7 +161,7 @@ void Phonon::pdisp()
      printf("\nPhonon dispersion data are written to: %s, you can visualize the results\n", fname);
      printf("by invoking: `gnuplot pdisp.gnuplot; gv pdisp.eps`\n");
    }
-   for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
+   puts("================================================================================");
  
    delete []fname;
    delete qnodes;

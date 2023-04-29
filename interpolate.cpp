@@ -1,6 +1,9 @@
-#include "math.h"
-#include "global.h"
+
 #include "interpolate.h"
+
+#include "global.h"
+
+#include <cmath>
 
 /* ----------------------------------------------------------------------------
  * Constructor used to get info from caller, and prepare other necessary data
@@ -268,8 +271,8 @@ void Interpolate::set_method()
    int im = 1;
    if (input == NULL) input = new UserInput(0);
 
-   printf("\n");for(int i=0; i<80; i++) printf("=");
-   printf("\nWhich interpolation method would you like to use?\n");
+   puts("\n================================================================================");
+   printf("Which interpolation method would you like to use?\n");
    printf("  1. Tricubic;\n  2. Trilinear;\n");
    printf("Your choice [1]: ");
    input->read_stdin(str);
@@ -278,7 +281,7 @@ void Interpolate::set_method()
  
    which =2-im%2;
    printf("Your  selection: %d\n", which);
-   for(int i=0; i<80; i++) printf("="); printf("\n\n");
+   puts("================================================================================\n");
  
    if (which == 1) tricubic_init();
  

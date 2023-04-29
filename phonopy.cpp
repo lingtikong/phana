@@ -1,9 +1,13 @@
+
 #ifdef FFTW3
-#include <map>
+
 #include "phonopy.h"
-#include "math.h"
 #include "kpath.h"
-#include "fftw3.h"
+
+#include <fftw3.h>
+
+#include <cmath>
+#include <map>
 
 /* ----------------------------------------------------------------------------
  * Class Phonopy is designed to interface with phonopy.
@@ -71,7 +75,7 @@ return;
 void Phonopy::write(int flag)
 {
    if (flag == 1){  // basic information
-      for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
+      puts("================================================================================");
       printf("Now to prepare the input files for phonopy.\n");
       printf("The dimension of your present supercell is   : %d x %d x %d.\n", dm->nx, dm->ny, dm->nz);
       printf("The size of the force constant matrix will be: %d x %d.\n", dm->npt*3, dm->npt*3);
@@ -94,12 +98,11 @@ void Phonopy::write(int flag)
       printf("Or the phonon density of states after\n");
       printf("  1) Correcting the `element names` in POSCAR.primitive and mesh.conf;\n");
       printf("  2) Running `phonopy --readfc -c POSCAR.primitive -p mesh.conf`.\n");
-      for (int ii = 0; ii < 80; ++ii) printf("-");
-      printf("\n***         Remember to modify the `element names`.          ***\n");
+      puts("--------------------------------------------------------------------------------");
+      printf("***         Remember to modify the `element names`.          ***\n");
 
    } else if (flag == 5){
-      for (int ii = 0; ii < 80; ++ii) printf("="); printf("\n");
-
+      puts("================================================================================");
    }
 return;
 }

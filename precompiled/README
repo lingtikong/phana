@@ -1,5 +1,2 @@
-phana_CentOS
-   Compiled on Ubuntu 16.04 with g++.
-
-phana_Ubuntu
-   Compiled on CentOS 7.4 with g++.
+phana_linux
+   Statically linked executable for any x86_64 Linux

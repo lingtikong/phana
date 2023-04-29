@@ -1,18 +1,16 @@
 #ifndef INTERPOLATION_H
 #define INTERPOLATION_H
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
-#include <string>
 #include "memory.h"
-#include "tricubic.h"
 #include "input.h"
 
-extern "C" {
-#include "f2c.h"
-#include "clapack.h"
-}
+#include "tricubic.h"
+#include "zheevd.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <string>
 
 class Interpolate{
 public:

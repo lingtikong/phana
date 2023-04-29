@@ -1,14 +1,9 @@
 #ifndef PHONON_H
 #define PHONON_H
 
-#include "stdio.h"
-#include "stdlib.h"
 #include "dynmat.h"
-#include "memory.h"
 #include "input.h"
-#include <math.h>
-
-using namespace std;
+#include "memory.h"
 
 class Phonon{
 public:
