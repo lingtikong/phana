@@ -4,11 +4,9 @@
 #define __STDC_LIMIT_MACROS
 #define __STDC_FORMAT_MACROS
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "limits.h"
-#include "stdint.h"
-#include "inttypes.h"
+#include <cstdlib>
+#include <stdint.h>
+#include <inttypes.h>
 
 typedef int64_t bigint;
 #define BIGINT_FORMAT "%" PRId64

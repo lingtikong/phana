@@ -153,17 +153,17 @@ DynMat::DynMat(int narg, char **arg)
       fclose(fp);
       exit(3);
    }
-   if (fread(basis[0], sizeof(double), fftdim, fp) != fftdim){
+   if (fread(basis[0], sizeof(double), fftdim, fp) != (size_t)fftdim){
       printf("\nError while reading basis info from file: %s\n", binfile);
       fclose(fp);
       exit(3);
    }
-   if (fread(&attyp[0], sizeof(int), nucell, fp) != nucell){
+   if (fread(&attyp[0], sizeof(int), nucell, fp) != (size_t)nucell){
       printf("\nError while reading atom types from file: %s\n", binfile);
       fclose(fp);
       exit(3);
    }
-   if (fread(&M_inv_sqrt[0], sizeof(double), nucell, fp) != nucell){
+   if (fread(&M_inv_sqrt[0], sizeof(double), nucell, fp) != (size_t)nucell){
       printf("\nError while reading atomic masses from file: %s\n", binfile);
       fclose(fp);
       exit(3);
@@ -515,10 +515,11 @@ void DynMat::GaussJordan(int n, double *Mat)
    indxc = new int[n];
    indxr = new int[n];
    ipiv  = new int[n];
- 
+
+   irow = icol = -1;
    for (i = 0; i < n; ++i) ipiv[i] = 0;
    for (i = 0; i < n; ++i){
-      big = 0.;
+      big = 0.0;
       for (j = 0; j < n; ++j){
          if (ipiv[j] != 1){
             for (k = 0; k < n; ++k){
