@@ -15,10 +15,14 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
-# hacks for MSVC to prevent lots of pointless warnings about "unsafe" functions
+# hacks for MSVC to prevent lots of pointless warnings about "unsafe" functions,
+# padding and Spectre mitigation
 if(MSVC)
   add_compile_options(/wd4244)
   add_compile_options(/wd4267)
+  add_compile_options(/wd4711)
+  add_compile_options(/wd4820)
+  add_compile_options(/wd5045)
   add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
