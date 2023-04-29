@@ -1,11 +1,13 @@
-#include "global.h"
+
 #include "kpath.h"
+
+#include "global.h"
 
 #ifdef UseSPG
 extern "C"{
 #include "spglib.h"
 }
-#include "math.h"
+#include <cmath>
 
 /* ----------------------------------------------------------------------------
  * Class kPath will help to find the high symmetry k-path for a given lattice.
@@ -63,7 +65,7 @@ kPath::kPath(DynMat *dm, QNodes *qn)
 void kPath::show_info()
 {
    // display the unit cell info read
-   for (int ii = 0; ii < 80; ++ii) printf("-"); printf("\n");
+   puts("--------------------------------------------------------------------------------");
    printf("The basis vectors of the unit cell:\n");
    for (int idim = 0; idim < 3; ++idim){
       printf("  A%d =", idim+1);
@@ -78,11 +80,9 @@ void kPath::show_info()
    if (num_atom > NUMATOM) printf("  ... (%d atoms omitted.)\n", num_atom-NUMATOM);
  
    printf("The space group number of your unit cell is: %d => %s\n", spgnum, symbol);
-   for (int ii = 0; ii < 80; ++ii) printf("-"); printf("\n");
- 
+   puts("--------------------------------------------------------------------------------");
    return;
 }
-
 
 /* ----------------------------------------------------------------------------
  * Free the memeory used by kPath.
@@ -2767,16 +2767,16 @@ void kPath::show_path()
    if (q == NULL) return;
    int nbin = q->ndstr.size();
    if (nbin > 0){
-      printf("\n"); for (int i = 0; i < 80; ++i) printf("-");
-      printf("\nk-path for the current lattice will be:\n  %s", q->ndstr[0].c_str());
+      puts("\n--------------------------------------------------------------------------------");
+      printf("k-path for the current lattice will be:\n  %s", q->ndstr[0].c_str());
       for (int is = 1; is < nbin; ++is) printf("-%s", q->ndstr[is].c_str());
 
       printf("\n\nThe fractional coordinates of these paths are:\n");
       for (int is = 0; is < nbin-1; ++is)
          printf("  [%6.4f %6.4f %6.4f] --> [%6.4f %6.4f %6.4f] (%s - %s)\n", q->qs[is][0],
-         q->qs[is][1], q->qs[is][2], q->qe[is][0], q->qe[is][1], q->qe[is][2],
-         q->ndstr[is].c_str(), q->ndstr[is+1].c_str() );
-      for (int i = 0; i < 80; ++i) printf("-"); printf("\n");
+                q->qs[is][1], q->qs[is][2], q->qe[is][0], q->qe[is][1], q->qe[is][2],
+                q->ndstr[is].c_str(), q->ndstr[is+1].c_str() );
+      puts("--------------------------------------------------------------------------------");
    }
 
    return;

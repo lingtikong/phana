@@ -1,10 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 #include "green.h"
-#include <complex>
+
 #include "global.h"
+
+#include <complex>
+#include <cmath>
+#include <cstdio>
 
 /*******************************************************************************
  * The class of Green is designed to evaluate the LDOS via the Green's Function
@@ -223,8 +223,6 @@ void Green::recursion()
 {
    // local variables
    std::complex<double> Z, rec_x, rec_x_inv;
-   std::complex<double> cunit = std::complex<double>(0.,1.);
- 
    double w = wmin;
  
    for (int i = 0; i < nw; ++i){

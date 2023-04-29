@@ -1,8 +1,8 @@
 
 #include "dynmat.h"
+
 #include "version.h"
 #include "global.h"
-
 #include "zheevd.h"
 
 #include <cmath>
@@ -365,7 +365,7 @@ void DynMat::EnforceASR()
    char str[MAXLINE];
    int nasr = 20;
    if (nucell <= 1) nasr = 1;
-   printf("\n"); for (int i = 0; i < 80; ++i) printf("=");
+   printf("\n================================================================================");
 
    // compute and display eigenvalues of Phi at gamma before ASR
    if (nucell > 100){
@@ -373,7 +373,7 @@ void DynMat::EnforceASR()
       fflush(stdout);
    }
 
-   double egvs[fftdim];
+   double *egvs = new double[fftdim];
    for (int i = 0; i < fftdim; ++i)
    for (int j = 0; j < fftdim; ++j) DM_q[i][j] = DM_all[0][i*fftdim+j];
    geteigen(egvs, 0);
@@ -391,7 +391,7 @@ void DynMat::EnforceASR()
    char *ptr = strtok(str," \t\n\r\f");
    if (ptr) nasr = atoi(ptr);
    if (nasr < 1){
-      for (int i=0; i<80; i++) printf("="); printf("\n");
+      puts("================================================================================");
       return;
    }
  
@@ -456,9 +456,8 @@ void DynMat::EnforceASR()
       if (i%10 == 9) printf("\n");
       if (i == 99){ printf("...... (%d more skiped)", fftdim-100); break;}
    }
-   printf("\n");
-   for (int i = 0; i < 80; ++i) printf("="); printf("\n\n");
- 
+   delete[] egvs;
+   puts("\n================================================================================\n");
    return;
 }
 
@@ -485,7 +484,7 @@ void DynMat::real2rec()
  
    for (int i = 0; i < 9; ++i) ibasevec[i] *= vol;
  
-   printf("\n"); for (int i = 0; i < 80; ++i) printf("=");
+   printf("\n================================================================================");
    printf("\nBasis vectors of the unit cell in real space:");
    for (int i = 0; i < sysdim; ++i){
       printf("\n     A%d: ", i+1);
@@ -496,8 +495,7 @@ void DynMat::real2rec()
       printf("\n     B%d: ", i+1);
       for (int j = 0; j < sysdim; ++j) printf("%8.4f ", ibasevec[i*3+j]);
    }
-   printf("\n"); for (int i = 0; i < 80; ++i) printf("="); printf("\n");
- 
+   puts("\n================================================================================");
    return;
 }
 
@@ -700,13 +698,13 @@ void DynMat::Define_Conversion_Factor()
  * ---------------------------------------------------------------------------- */
 void DynMat::ShowInfo()
 {
-   printf("\n"); for (int i = 0; i < 80; ++i) printf("="); printf("\n");
+   puts("\n================================================================================");
    printf("Dynamical matrix is read from file: %s\n", binfile);
    printf("The system size in three dimension: %d x %d x %d\n", nx, ny, nz);
    printf("Number of atoms per unit cell     : %d\n", nucell);
    printf("System dimension                  : %d\n", sysdim);
    printf("Boltzmann constant in used units  : %g\n", boltz);
-   for (int i = 0; i < 80; ++i) printf("="); printf("\n");
+   puts("================================================================================");
    return;
 }
 /* --------------------------------------------------------------------*/
