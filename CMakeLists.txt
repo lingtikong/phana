@@ -1,7 +1,7 @@
 
-# Support Linux from Ubuntu 20.04LTS onward, CentOS 7.x (with EPEL),
+# Support Linux from Ubuntu 18.04LTS onward, CentOS 7.x (with EPEL),
 # macOS, MSVC 2019 (=Version 16)
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.10)
 
 # set timestamp of downloaded files to that of archive
 if(POLICY CMP0135)
@@ -41,7 +41,7 @@ add_executable(phana
   qnodes.cpp
   timer.cpp
 )
-target_include_directories(phana PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(phana PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 find_package(FFTW3)

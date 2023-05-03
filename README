@@ -59,6 +59,7 @@
 7. Portability
    Build and use of phana has been successfully tested on:
     - Fedora Linux 38 using GCC, Clang, and MinGW Linux2Windows cross-compiler
+    - Ubuntu 18.04LTS and 20.04LTS
     - macOS 12 (Monterey) using Xcode
     - Windows 11 using Visual Studio 2022 with MSVC and Clang
 
