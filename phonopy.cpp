@@ -2,11 +2,18 @@
 #ifdef FFTW3
 
 #include "phonopy.h"
-#include "kpath.h"
+
+#include "global.h"
+#include "dynmat.h"
+#include "input.h"
+#include "memory.h"
 
 #include <fftw3.h>
 
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <map>
 
 /* ----------------------------------------------------------------------------
@@ -43,7 +50,7 @@ Phonopy::Phonopy(DynMat *dynmat)
 
    memory->create(mass, nucell, "Phonopy:mass");
    for (int i = 0; i < nucell; ++i){
-      double m = 1./dm->M_inv_sqrt[i];
+      double m = 1.0/dm->M_inv_sqrt[i];
       mass[i] = m * m;
    }
 
@@ -168,7 +175,9 @@ void Phonopy::phonopy()
    memory->destroy(out);
 
    // in POSCAR, atoms are sorted/aggregated by type, while for LAMMPS there is no such requirment
-   int type_id[nucell], num_type[nucell], ntype = 0;
+   int *type_id = new int[nucell];
+   int *num_type = new int[nucell];
+   int ntype = 0;
    for (int i = 0; i < nucell; ++i) num_type[i] = 0;
    for (int i = 0; i < nucell; ++i){
       int ip = ntype;
@@ -241,7 +250,8 @@ void Phonopy::phonopy()
       for (int jdim = 0; jdim < 3; ++jdim) fprintf(fp, "%lg ", dm->basevec[ndim++]);
       fprintf(fp, "\n");
    }
-   for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]); fprintf(fp, "\n");
+   for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "Elem-%d ", type_id[ip]);
+   fprintf(fp, "\n");
    for (int ip = 0; ip < ntype; ++ip) fprintf(fp, "%d ", num_type[ip]);
    fprintf(fp, "\nDirect\n");
    for (int ip = 0; ip < ntype; ++ip){
@@ -292,8 +302,9 @@ void Phonopy::phonopy()
    // output info
    write(4);
    write(5);
-
-return;
+   delete[] type_id;
+   delete[] num_type;
+   return;
 }
 
 /*------------------------------------------------------------------------------
@@ -307,7 +318,7 @@ int Phonopy::count_words(const char *line)
    strcpy(copy,line);
   
    char *ptr;
-   if (ptr = strchr(copy,'#')) *ptr = '\0';
+   if ((ptr = strchr(copy,'#'))) *ptr = '\0';
   
    if (strtok(copy," \t\n\r\f") == NULL) {
      memory->destroy(copy);
@@ -317,7 +328,7 @@ int Phonopy::count_words(const char *line)
    while (strtok(NULL," \t\n\r\f")) n++;
   
    memory->destroy(copy);
-return n;
+   return n;
 }
 /*----------------------------------------------------------------------------*/
 #endif

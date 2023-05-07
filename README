@@ -56,6 +56,15 @@
    Linux machine with using the x86_64 architecture. It includes
    spglib support but not fftw3.
 
+7. Portability
+   Build and use of phana has been successfully tested on:
+    - Fedora Linux 38 using GCC, Clang, and MinGW Linux2Windows cross-compiler
+    - Ubuntu Linux 18.04LTS and 20.04LTS using GCC
+    - Debian Linux 11 and 12 using GCC
+    - macOS 12 (Monterey) using Xcode
+    - Windows 11 using Visual Studio 2022 using MSVC and Clang
+    - FreeBSD 13.1 using Clang
+
 #-------------------------------------------------------------------------------
 Author: Ling-Ti Kong, konglt(at)sjtu.edu.cn
 Aug 2021

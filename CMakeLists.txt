@@ -1,7 +1,7 @@
 
-# Support Linux from Ubuntu 20.04LTS onward, CentOS 7.x (with EPEL),
+# Support Linux from Ubuntu 18.04LTS onward, CentOS 7.x (with EPEL),
 # macOS, MSVC 2019 (=Version 16)
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.10)
 
 # set timestamp of downloaded files to that of archive
 if(POLICY CMP0135)
@@ -9,16 +9,20 @@ if(POLICY CMP0135)
 endif()
 
 # set up project
-project(phana VERSION 47 DESCRIPTION "Fix phonon post-processor" LANGUAGES CXX C)
+project(phana VERSION 48 DESCRIPTION "Fix phonon post-processor" LANGUAGES CXX C)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
-# hacks for MSVC to prevent lots of pointless warnings about "unsafe" functions
+# hacks for MSVC to prevent lots of pointless warnings about "unsafe" functions,
+# padding and Spectre mitigation
 if(MSVC)
   add_compile_options(/wd4244)
   add_compile_options(/wd4267)
+  add_compile_options(/wd4711)
+  add_compile_options(/wd4820)
+  add_compile_options(/wd5045)
   add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
@@ -37,7 +41,7 @@ add_executable(phana
   qnodes.cpp
   timer.cpp
 )
-target_include_directories(phana PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(phana PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 find_package(FFTW3)

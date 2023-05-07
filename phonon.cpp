@@ -1,15 +1,18 @@
 
 #include "phonon.h"
 
-#include "green.h"
 #include "global.h"
+#include "dynmat.h"
+#include "green.h"
+#include "input.h"
+#include "memory.h"
 #include "timer.h"
+#include "zheevd.h"
 
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <vector>
 
 #ifdef UseSPG
 extern "C"{
@@ -883,9 +886,12 @@ void Phonon::QMesh()
       mesh[0] = nx; mesh[1] = ny; mesh[2] = nz;
       shift[0] = shift[1] = shift[2] = 0;
       int num_grid = mesh[0]*mesh[1]*mesh[2];
-      int grid_point[num_grid][3];
+      int **grid_point;
+      memory->create(grid_point, num_grid, 3, "phonon:grid_point");
       int *map = new int[num_grid];
-      double symprec = 1.e-3, pos[num_atom][3];
+      double symprec = 1.0e-3;
+      double **pos;
+      memory->create(pos, num_atom, 3, "phonon:pos");
       if (dynmat->symprec > 0.) symprec = dynmat->symprec;
   
       for (int i = 0; i < num_atom; ++i)
@@ -893,7 +899,8 @@ void Phonon::QMesh()
               pos[i][j] = atpos[i][j];
   
       // if spglib >= 1.0.3 is used
-      nq = spg_get_ir_reciprocal_mesh(grid_point, map, mesh, shift, is_time_reversal, latvec, pos, attyp, num_atom, symprec);
+      nq = spg_get_ir_reciprocal_mesh((int (*)[3])grid_point, map, mesh, shift, is_time_reversal,
+                                      latvec, (double (*)[3])pos, attyp, num_atom, symprec);
   
       memory->create(wt,   nq, "QMesh:wt");
       memory->create(qpts, nq,3,"QMesh:qpts");
@@ -914,12 +921,14 @@ void Phonon::QMesh()
             qpts[numq][2] = double(grid_point[i][2])/double(mesh[2]);
             numq++;
          }
-         wt[iq2idx[iq]] += 1.;
+         wt[iq2idx[iq]] += 1.0;
       }
       delete[] iq2idx;
       delete[] map;
+      memory->destroy(grid_point);
+      memory->destroy(pos);
 
-      double wsum = 0.;
+      double wsum = 0.0;
       for (int iq = 0; iq < nq; ++iq) wsum += wt[iq];
       for (int iq = 0; iq < nq; ++iq) wt[iq] /= wsum;
       

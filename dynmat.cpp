@@ -1,11 +1,16 @@
 
 #include "dynmat.h"
 
-#include "version.h"
 #include "global.h"
+#include "input.h"
+#include "interpolate.h"
+#include "memory.h"
+#include "version.h"
 #include "zheevd.h"
 
 #include <cmath>
+#include <cstdlib>
+#include <cstring>
 
 /* ----------------------------------------------------------------------------
  * Class DynMat stores the Dynamic Matrix read from the binary file from
@@ -132,7 +137,7 @@ DynMat::DynMat(int narg, char **arg)
    memory->create(DM_q, fftdim,fftdim,"DynMat:DM_q");
  
    // read all dynamical matrix info into DM_all
-   if (fread(DM_all[0], sizeof(doublecomplex), npt*fftdim2, fp) != size_t(npt*fftdim2)){
+   if (fread(DM_all[0], sizeof(doublecomplex), npt*size_t(fftdim2), fp) != npt*size_t(fftdim2)) {
       printf("\nError while reading the DM from file: %s\n", binfile);
       fclose(fp);
       exit(1);
@@ -153,17 +158,17 @@ DynMat::DynMat(int narg, char **arg)
       fclose(fp);
       exit(3);
    }
-   if (fread(basis[0], sizeof(double), fftdim, fp) != fftdim){
+   if (fread(basis[0], sizeof(double), fftdim, fp) != (size_t)fftdim){
       printf("\nError while reading basis info from file: %s\n", binfile);
       fclose(fp);
       exit(3);
    }
-   if (fread(&attyp[0], sizeof(int), nucell, fp) != nucell){
+   if (fread(&attyp[0], sizeof(int), nucell, fp) != (size_t)nucell){
       printf("\nError while reading atom types from file: %s\n", binfile);
       fclose(fp);
       exit(3);
    }
-   if (fread(&M_inv_sqrt[0], sizeof(double), nucell, fp) != nucell){
+   if (fread(&M_inv_sqrt[0], sizeof(double), nucell, fp) != (size_t)nucell){
       printf("\nError while reading atomic masses from file: %s\n", binfile);
       fclose(fp);
       exit(3);
@@ -515,16 +520,17 @@ void DynMat::GaussJordan(int n, double *Mat)
    indxc = new int[n];
    indxr = new int[n];
    ipiv  = new int[n];
- 
+
+   irow = icol = -1;
    for (i = 0; i < n; ++i) ipiv[i] = 0;
    for (i = 0; i < n; ++i){
-      big = 0.;
+      big = 0.0;
       for (j = 0; j < n; ++j){
          if (ipiv[j] != 1){
             for (k = 0; k < n; ++k){
                if (ipiv[k] == 0){
                   idr = j * n + k;
-                  nmjk = abs(Mat[idr]);
+                  nmjk = fabs(Mat[idr]);
                   if (nmjk >= big){
                      big  = nmjk;
                      irow = j;

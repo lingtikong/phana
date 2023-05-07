@@ -1,6 +1,6 @@
 #include "green.h"
 
-#include "global.h"
+#include "memory.h"
 
 #include <complex>
 #include <cmath>

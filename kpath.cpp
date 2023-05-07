@@ -2,12 +2,18 @@
 #include "kpath.h"
 
 #include "global.h"
+#include "dynmat.h"
+#include "memory.h"
+#include "qnodes.h"
 
 #ifdef UseSPG
 extern "C"{
 #include "spglib.h"
 }
 #include <cmath>
+#include <cstdio>
+#include <string>
+#include <vector>
 
 /* ----------------------------------------------------------------------------
  * Class kPath will help to find the high symmetry k-path for a given lattice.
@@ -49,13 +55,15 @@ kPath::kPath(DynMat *dm, QNodes *qn)
    for (int idim = 0; idim < sysdim; ++idim) atpos[i][idim] = dynmat->basis[i][idim];
  
    // get the space group number
-   double symprec = 1.e-3, pos[num_atom][3];
-   if (dynmat->symprec > 0.) symprec = dynmat->symprec;
+   double symprec = 1.0e-3;
+   double **pos;
+   memory->create(pos,num_atom,3,"kpath:pos");
+   if (dynmat->symprec > 0.0) symprec = dynmat->symprec;
 
    for (int i = 0; i < num_atom; ++i)
    for (int j = 0; j < 3; ++j) pos[i][j] = atpos[i][j];
-   spgnum  = spg_get_international(symbol, latvec, pos, attyp, num_atom, symprec);
- 
+   spgnum  = spg_get_international(symbol, latvec, (double (*)[3])pos, attyp, num_atom, symprec);
+   memory->destroy(pos);
    return;
 }
 

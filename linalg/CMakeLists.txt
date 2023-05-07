@@ -1,7 +1,7 @@
 
-# Support Linux from Ubuntu 20.04LTS onward, CentOS 7.x (with EPEL),
+# Support Linux from Ubuntu 18.04LTS onward, CentOS 7.x (with EPEL),
 # macOS, MSVC 2019 (=Version 16)
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.10)
 
 # set up project
 project(linalg VERSION 3.1 DESCRIPTION "Linear Algebra library" LANGUAGES CXX)

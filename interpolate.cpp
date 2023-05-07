@@ -2,8 +2,13 @@
 #include "interpolate.h"
 
 #include "global.h"
+#include "input.h"
+#include "memory.h"
+#include "tricubic.h"
 
-#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 /* ----------------------------------------------------------------------------
  * Constructor used to get info from caller, and prepare other necessary data
