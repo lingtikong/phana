@@ -1,6 +1,8 @@
 #ifndef PHONON_H
 #define PHONON_H
 
+#include <cstdio>
+
 class Phonon{
 public:
    Phonon(class DynMat *);
@@ -38,6 +40,7 @@ private:
    void vecanyq();
  
    void ShowCell();
+   void WriteCell(FILE *);
  
    void smooth(double *, const int);
    void writeDOS();

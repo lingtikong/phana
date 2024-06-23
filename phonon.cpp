@@ -212,6 +212,7 @@ void Phonon::writeDOS()
    printf("The total phonon DOS will be written to file: %s\n", fname);
  
    FILE *fp = fopen(fname, "w");
+   WriteCell(fp);
    fprintf(fp,"# frequency  DOS\n");
    fprintf(fp,"#%s  number\n", dynmat->funit);
    double freq = fmin;
@@ -250,6 +251,7 @@ void Phonon::writeLDOS()
       char *fname = strtok(str," \t\n\r\f");
   
       FILE *fp = fopen(fname, "w"); fname = NULL;
+      WriteCell(fp);
       fprintf(fp,"#freq xDOS yDOS zDOS total\n");
       double freq = fmin;
       for (int i = 0; i < ndos; ++i){
@@ -1078,6 +1080,26 @@ void Phonon::ShowCell()
    for (int i = 0; i < dynmat->nucell; ++i)
      printf("%4d %12.8f %12.8f %12.8f\n", dynmat->attyp[i], dynmat->basis[i][0], dynmat->basis[i][1], dynmat->basis[i][2]);
    puts("================================================================================");
+ 
+   return;
+}
+
+/* ----------------------------------------------------------------------------
+ * Private method to show the unit cell info
+ * ---------------------------------------------------------------------------- */
+void Phonon::WriteCell(FILE *fp)
+{
+   fprintf(fp, "# ------------------------------------------------------------------------------ \n");
+   fprintf(fp, "# Basic information of the crystal:\n");
+   fprintf(fp, "# Number of atoms in the unit cell: %d\n", dynmat->nucell);
+   fprintf(fp, "# Basis  vectors  of the unit cell:\n");
+   fprintf(fp, "#  %15.8f  %15.8f  %15.8f\n", dynmat->basevec[0],  dynmat->basevec[1],  dynmat->basevec[2]);
+   fprintf(fp, "#  %15.8f  %15.8f  %15.8f\n", dynmat->basevec[3],  dynmat->basevec[4],  dynmat->basevec[5]);
+   fprintf(fp, "#  %15.8f  %15.8f  %15.8f\n", dynmat->basevec[6],  dynmat->basevec[7],  dynmat->basevec[8]);
+   fprintf(fp, "# Atomic type and fractional coordinates:\n");
+   for (int i = 0; i < dynmat->nucell; ++i)
+     fprintf(fp, "# %4d %12.8f %12.8f %12.8f\n", dynmat->attyp[i], dynmat->basis[i][0], dynmat->basis[i][1], dynmat->basis[i][2]);
+   fprintf(fp, "# ------------------------------------------------------------------------------ \n");
  
    return;
 }

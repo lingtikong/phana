@@ -105,6 +105,7 @@ void Phonon::pdisp()
 #endif
 
    FILE *fp = fopen(fname, "w");
+   WriteCell(fp);
    fprintf(fp,"# q     qr    freq\n");
    fprintf(fp,"# 2pi/L  2pi/L %s\n", dynmat->funit);
  
